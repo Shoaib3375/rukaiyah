@@ -13,7 +13,11 @@ class UpdateRequest extends FormRequest
 
     public function rules(): array
     {
+        $user = auth('api')->user();
         return [
+            'full_name' => 'nullable|string|max:255',
+            'email' => 'nullable|email|unique:users,email,' . ($user ? $user->id : 'NULL') . ',id',
+            'phone' => 'nullable|string|max:20',
             'bio' => 'nullable|string',
             'specialization' => 'nullable|string',
             'languages' => 'nullable|string',

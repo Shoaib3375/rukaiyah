@@ -9,13 +9,30 @@ class PatientProfileController extends ApiController
 {
     public function show(): JsonResponse
     {
-        return $this->success(auth('api')->user()->patientProfile);
+        $user = auth('api')->user();
+        $profile = $user->patientProfile;
+        
+        $data = $profile->toArray();
+        $data['full_name'] = $user->full_name;
+        $data['email']     = $user->email;
+        $data['phone']     = $user->phone;
+
+        return $this->success($data);
     }
 
     public function update(UpdateRequest $request): JsonResponse
     {
-        $profile = auth('api')->user()->patientProfile;
-        $profile->update($request->validated());
-        return $this->success($profile, 'Profile updated successfully.');
+        $user = auth('api')->user();
+        $profile = $user->patientProfile;
+
+        $profile->update($request->only(['address', 'emergency_contact', 'medical_notes']));
+        $user->update($request->only(['full_name', 'email', 'phone']));
+
+        $data = $profile->toArray();
+        $data['full_name'] = $user->full_name;
+        $data['email']     = $user->email;
+        $data['phone']     = $user->phone;
+
+        return $this->success($data, 'Profile updated successfully.');
     }
 }

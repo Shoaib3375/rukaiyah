@@ -9,13 +9,30 @@ class RaqiProfileController extends ApiController
 {
     public function show(): JsonResponse
     {
-        return $this->success(auth('api')->user()->raqiProfile);
+        $user = auth('api')->user();
+        $profile = $user->raqiProfile;
+        
+        $data = $profile->toArray();
+        $data['full_name'] = $user->full_name;
+        $data['email']     = $user->email;
+        $data['phone']     = $user->phone;
+
+        return $this->success($data);
     }
 
     public function update(UpdateRequest $request): JsonResponse
     {
-        $profile = auth('api')->user()->raqiProfile;
-        $profile->update($request->validated());
-        return $this->success($profile, 'Profile updated successfully.');
+        $user = auth('api')->user();
+        $profile = $user->raqiProfile;
+
+        $profile->update($request->only(['bio', 'specialization', 'languages']));
+        $user->update($request->only(['full_name', 'email', 'phone']));
+
+        $data = $profile->toArray();
+        $data['full_name'] = $user->full_name;
+        $data['email']     = $user->email;
+        $data['phone']     = $user->phone;
+
+        return $this->success($data, 'Profile updated successfully.');
     }
 }

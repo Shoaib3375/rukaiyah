@@ -13,6 +13,7 @@ import InviteAccept from './views/Auth/InviteAccept.vue';
 import PatientDashboard from './views/Patient/Dashboard.vue';
 import PatientProfile from './views/Patient/Profile.vue';
 import PatientAppointments from './views/Patient/Appointments.vue';
+import PatientAppointmentDetail from './views/Patient/AppointmentDetail.vue';
 import PatientBookAppointment from './views/Patient/BookAppointment.vue';
 import PatientBrowseRaqis from './views/Patient/BrowseRaqis.vue';
 import PatientRaqiDetail from './views/Patient/RaqiDetail.vue';
@@ -46,6 +47,7 @@ const routes = [
       { path: '', name: 'patient-dashboard', component: PatientDashboard },
       { path: 'profile', name: 'patient-profile', component: PatientProfile },
       { path: 'appointments', name: 'patient-appointments', component: PatientAppointments },
+      { path: 'appointments/:id', name: 'patient-appointment-detail', component: PatientAppointmentDetail },
       { path: 'appointments/book', name: 'patient-book-appointment', component: PatientBookAppointment },
       { path: 'raqis', name: 'patient-browse-raqis', component: PatientBrowseRaqis },
       { path: 'raqis/:id', name: 'patient-raqi-detail', component: PatientRaqiDetail },

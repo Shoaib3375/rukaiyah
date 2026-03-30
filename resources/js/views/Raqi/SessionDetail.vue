@@ -9,7 +9,7 @@
           <div class="flex items-start justify-between mb-4">
             <div>
               <p class="eyebrow">Session</p>
-              <h1 class="page-title mb-0">{{ appointment.patient_profile?.user?.full_name }}</h1>
+              <h1 class="page-title mb-0">{{ appointment.patient?.full_name }}</h1>
             </div>
             <span :class="`badge badge-${appointment.status}`">{{ appointment.status }}</span>
           </div>
@@ -36,7 +36,7 @@
         <!-- Session notes -->
         <div class="card">
           <p class="sec-label mb-4">Session Notes</p>
-          <form v-if="appointment.status === 'accepted'" @submit.prevent="addNote" class="space-y-3 mb-6">
+          <form v-if="appointment.status === 'confirmed'" @submit.prevent="addNote" class="space-y-3 mb-6">
             <div class="field">
               <label>Note Type</label>
               <select v-model="newNote.note_type">
@@ -62,7 +62,7 @@
         </div>
 
         <!-- Invite co-Raqi -->
-        <div v-if="appointment.status === 'accepted'" class="card">
+        <div v-if="appointment.status === 'confirmed'" class="card">
           <p class="sec-label mb-3">Invite Co-Raqi</p>
           <form @submit.prevent="inviteCoRaqi" class="flex gap-3">
             <div class="field flex-1">
@@ -87,7 +87,7 @@
         </div>
 
         <!-- Complete -->
-        <div v-if="appointment.status === 'accepted'">
+        <div v-if="appointment.status === 'confirmed'">
           <button @click="completeAppointment" class="btn-gold w-full">✓ Complete Session</button>
         </div>
       </div>
@@ -117,22 +117,22 @@ const inviteForm = reactive({ raqi_id: '' });
 onMounted(async () => {
   try {
     const [aptRes, notesRes, partsRes] = await Promise.all([
-      raqiAPI.appointments.list(),
+      raqiAPI.appointments.get(route.params.id),
       raqiAPI.notes.list(route.params.id),
       raqiAPI.participants.list(route.params.id),
     ]);
-    appointment.value = unwrap(aptRes).find(a => a.id === route.params.id);
+    appointment.value = unwrap(aptRes);
     sessionNotes.value = unwrap(notesRes);
     participants.value = unwrap(partsRes);
   } catch (e) { console.error(e); }
 });
 
 const acceptAppointment = async () => {
-  try { await raqiAPI.appointments.accept(route.params.id); appointment.value.status = 'accepted'; }
+  try { await raqiAPI.appointments.accept(route.params.id); appointment.value.status = 'confirmed'; }
   catch (e) { alert('Failed'); }
 };
 const declineAppointment = async () => {
-  try { await raqiAPI.appointments.decline(route.params.id); appointment.value.status = 'declined'; }
+  try { await raqiAPI.appointments.decline(route.params.id); appointment.value.status = 'cancelled'; }
   catch (e) { alert('Failed'); }
 };
 const addNote = async () => {

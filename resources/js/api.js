@@ -91,6 +91,7 @@ export const raqiAPI = {
     },
     appointments: {
         list: () => api.get('/raqi/appointments'),
+        get: (id) => api.get(`/raqi/appointments/${id}`),
         accept: (id) => api.put(`/raqi/appointments/${id}/accept`),
         decline: (id) => api.put(`/raqi/appointments/${id}/decline`),
         complete: (id) => api.put(`/raqi/appointments/${id}/complete`)
