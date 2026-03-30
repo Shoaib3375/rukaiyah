@@ -1,10 +1,12 @@
 import { ref, computed } from 'vue';
 import { authAPI } from './api';
+import { initializeReverb } from './reverb';
 
 const user = ref(null);
 const token = ref(localStorage.getItem('token'));
 const isAuthenticated = computed(() => !!token.value);
 const userRole = computed(() => user.value?.role);
+const authReady = ref(false);
 
 // Initialize user on app load
 export const initAuth = async () => {
@@ -12,10 +14,12 @@ export const initAuth = async () => {
         try {
             const { data } = await authAPI.me();
             user.value = data.data;
+            initializeReverb();
         } catch (error) {
             logout();
         }
     }
+    authReady.value = true;
 };
 
 export const login = async (email, password) => {
@@ -24,6 +28,7 @@ export const login = async (email, password) => {
         token.value = data.data.access_token;
         user.value = data.data.user;
         localStorage.setItem('token', token.value);
+        initializeReverb();
         return { success: true, data };
     } catch (error) {
         return { success: false, error: error.response?.data?.message || 'Login failed' };
@@ -36,6 +41,7 @@ export const register = async (formData) => {
         token.value = data.data.access_token;
         user.value = data.data.user;
         localStorage.setItem('token', token.value);
+        initializeReverb();
         return { success: true, data };
     } catch (error) {
         return { success: false, error: error.response?.data?.message || 'Registration failed' };
@@ -70,6 +76,7 @@ export {
     user,
     token,
     isAuthenticated,
-    userRole
+    userRole,
+    authReady
 };
 

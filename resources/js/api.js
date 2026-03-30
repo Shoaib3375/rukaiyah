@@ -120,6 +120,7 @@ export const adminAPI = {
     },
     raqis: {
         pending: () => api.get('/admin/raqis/pending'),
+        approved: () => api.get('/admin/raqis/approved'),
         approve: (id) => api.put(`/admin/raqis/${id}/approve`),
         suspend: (id) => api.put(`/admin/raqis/${id}/suspend`)
     },

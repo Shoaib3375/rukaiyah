@@ -1,68 +1,63 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-12 px-4">
-    <div class="max-w-7xl mx-auto">
-      <!-- Welcome Section -->
-      <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome, {{ user?.full_name }}!</h1>
-        <p class="text-gray-600">Find trusted Raqis for your spiritual healing journey</p>
+  <div class="page">
+    <div class="page-inner">
+
+      <!-- Header -->
+      <div class="mb-8">
+        <p class="eyebrow">Patient</p>
+        <h1 class="page-title">Welcome back, {{ user?.full_name?.split(' ')[0] }}</h1>
+        <p class="page-sub">Your spiritual healing journey continues</p>
       </div>
 
-      <!-- Quick Stats -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow p-6">
-          <h3 class="text-gray-500 text-sm font-medium">Upcoming Appointments</h3>
-          <p class="text-3xl font-bold text-blue-600 mt-2">{{ stats.upcomingCount }}</p>
+      <!-- Stats -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div class="stat-card">
+          <div class="stat-label">Upcoming</div>
+          <div class="stat-value">{{ stats.upcomingCount }}</div>
         </div>
-        <div class="bg-white rounded-lg shadow p-6">
-          <h3 class="text-gray-500 text-sm font-medium">Completed Sessions</h3>
-          <p class="text-3xl font-bold text-green-600 mt-2">{{ stats.completedCount }}</p>
+        <div class="stat-card">
+          <div class="stat-label">Completed</div>
+          <div class="stat-value" style="color:#a5b4fc">{{ stats.completedCount }}</div>
         </div>
-        <div class="bg-white rounded-lg shadow p-6">
-          <h3 class="text-gray-500 text-sm font-medium">Unread Notifications</h3>
-          <p class="text-3xl font-bold text-orange-600 mt-2">{{ stats.unreadCount }}</p>
+        <div class="stat-card">
+          <div class="stat-label">Notifications</div>
+          <div class="stat-value" style="color:#fbbf24">{{ stats.unreadCount }}</div>
         </div>
       </div>
 
-      <!-- Quick Actions -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <router-link
-          to="/patient/appointments/book"
-          class="bg-blue-600 text-white rounded-lg shadow-lg p-8 hover:bg-blue-700 transition"
-        >
-          <h2 class="text-2xl font-bold mb-2">📅 Book Appointment</h2>
-          <p class="text-blue-100">Find and book with an available Raqi</p>
+      <!-- Quick actions -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+        <router-link to="/patient/appointments/book" class="action-card">
+          <div class="action-card-icon">📅</div>
+          <div class="action-card-title">Book Appointment</div>
+          <div class="action-card-sub">Find and book with an available Raqi</div>
         </router-link>
-
-        <router-link
-          to="/patient/raqis"
-          class="bg-purple-600 text-white rounded-lg shadow-lg p-8 hover:bg-purple-700 transition"
-        >
-          <h2 class="text-2xl font-bold mb-2">👥 Browse Raqis</h2>
-          <p class="text-purple-100">View profiles and availability of Raqis</p>
+        <router-link to="/patient/raqis" class="action-card">
+          <div class="action-card-icon">👥</div>
+          <div class="action-card-title">Browse Raqis</div>
+          <div class="action-card-sub">View profiles and availability</div>
         </router-link>
       </div>
 
-      <!-- Recent Appointments -->
-      <div class="bg-white rounded-lg shadow mt-8 p-6">
-        <h2 class="text-2xl font-bold mb-4">Recent Appointments</h2>
-        <div v-if="recentAppointments.length" class="space-y-4">
-          <div
-            v-for="apt in recentAppointments"
-            :key="apt.id"
-            class="border rounded-lg p-4 flex justify-between items-center"
-          >
+      <!-- Recent appointments -->
+      <div class="card-gold">
+        <p class="sec-label">Recent Appointments</p>
+        <div v-if="loading" class="space-y-3">
+          <div v-for="i in 3" :key="i" class="skeleton h-14"></div>
+        </div>
+        <div v-else-if="recentAppointments.length" class="space-y-2">
+          <div v-for="apt in recentAppointments" :key="apt.id"
+            class="flex items-center justify-between py-3 border-b border-white/5 last:border-0">
             <div>
-              <h3 class="font-bold">{{ apt.lead_raqi?.user?.full_name }}</h3>
-              <p class="text-sm text-gray-600">{{ formatDateTime(apt.scheduled_at) }}</p>
-              <p class="text-sm text-gray-600">{{ apt.session_type }}</p>
+              <p class="text-sm text-cream/80 font-medium">{{ apt.lead_raqi?.user?.full_name }}</p>
+              <p class="text-xs text-cream/35 mt-0.5">{{ formatDateTime(apt.scheduled_at) }} · {{ apt.session_type }}</p>
             </div>
-            <span :class="`px-3 py-1 rounded text-sm font-medium ${getStatusClass(apt.status)}`">
-              {{ apt.status }}
-            </span>
+            <span :class="`badge badge-${apt.status}`">{{ apt.status }}</span>
           </div>
         </div>
-        <p v-else class="text-gray-600">No recent appointments</p>
+        <div v-else class="empty-state">No recent appointments</div>
       </div>
+
     </div>
   </div>
 </template>
@@ -71,29 +66,34 @@
 import { ref, onMounted } from 'vue';
 import { user } from '../../store';
 import { patientAPI } from '../../api';
-import { formatDateTime, getStatusClass } from '../../utils';
+import { formatDateTime, unwrap } from '../../utils';
 
-const stats = ref({
-  upcomingCount: 0,
-  completedCount: 0,
-  unreadCount: 0
-});
-
+const stats = ref({ upcomingCount: 0, completedCount: 0, unreadCount: 0 });
 const recentAppointments = ref([]);
+const loading = ref(true);
 
 onMounted(async () => {
   try {
-    const response = await patientAPI.appointments.list();
-    const appointments = response.data.data;
-
-    recentAppointments.value = appointments.slice(0, 3);
-    stats.value.upcomingCount = appointments.filter(a => a.status === 'accepted').length;
-    stats.value.completedCount = appointments.filter(a => a.status === 'completed').length;
-
-    const notificationsResponse = await patientAPI.notifications.list();
-    stats.value.unreadCount = notificationsResponse.data.data.filter(n => !n.read_at).length;
-  } catch (error) {
-    console.error('Failed to load dashboard:', error);
+    const [aptRes, notifRes] = await Promise.all([
+      patientAPI.appointments.list(),
+      patientAPI.notifications.list()
+    ]);
+    const apts = unwrap(aptRes);
+    const notifs = unwrap(notifRes);
+    recentAppointments.value = apts.slice(0, 3);
+    stats.value.upcomingCount = apts.filter(a => a.status === 'accepted').length;
+    stats.value.completedCount = apts.filter(a => a.status === 'completed').length;
+    stats.value.unreadCount = notifs.filter(n => !n.read_at).length;
+  } catch (e) {
+    console.error(e);
+  } finally {
+    loading.value = false;
   }
 });
 </script>
+
+<style scoped>
+@import '../../styles/app.css';
+.text-cream { color: #f5f0e8; }
+.eyebrow { color: rgba(201,168,76,0.55); font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase; margin-bottom: 0.5rem; }
+</style>

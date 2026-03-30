@@ -1,38 +1,38 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-12 px-4">
-    <div class="max-w-4xl mx-auto">
-      <h1 class="text-3xl font-bold mb-8">My Profile</h1>
+  <div class="page">
+    <div class="page-inner-sm">
+      <p class="eyebrow">Patient</p>
+      <h1 class="page-title">My Profile</h1>
+      <p class="page-sub">Manage your account details</p>
 
-      <form @submit.prevent="handleSave" class="bg-white rounded-lg shadow-lg p-8 space-y-4">
-        <div v-if="message" :class="`p-4 rounded mb-4 ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`">
-          {{ message.text }}
-        </div>
+      <div class="card-gold">
+        <div v-if="message" :class="message.type === 'success' ? 'alert-success' : 'alert-error'" class="mb-4">{{ message.text }}</div>
 
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-            <input v-model="profile.full_name" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+        <form @submit.prevent="handleSave" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="field">
+              <label>Full Name</label>
+              <input v-model="profile.full_name" type="text" />
+            </div>
+            <div class="field">
+              <label>Email</label>
+              <input v-model="profile.email" type="email" />
+            </div>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input v-model="profile.email" type="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+          <div class="field">
+            <label>Phone</label>
+            <input v-model="profile.phone" type="tel" />
           </div>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-          <input v-model="profile.phone" type="tel" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Health Issues (optional)</label>
-          <textarea v-model="profile.health_issues" rows="4" placeholder="Describe your health concerns..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
-        </div>
-
-        <button :disabled="loading" class="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50">
-          {{ loading ? 'Saving...' : 'Save Changes' }}
-        </button>
-      </form>
+          <div class="field">
+            <label>Health Notes (optional)</label>
+            <textarea v-model="profile.medical_notes" rows="4" placeholder="Describe your health concerns…"></textarea>
+          </div>
+          <button type="submit" :disabled="loading" class="btn-gold w-full">
+            <span v-if="loading" class="spinner"></span>
+            {{ loading ? 'Saving…' : 'Save Changes' }}
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 </template>
@@ -43,31 +43,25 @@ import { patientAPI } from '../../api';
 
 const loading = ref(false);
 const message = ref(null);
-const profile = reactive({
-  full_name: '',
-  email: '',
-  phone: '',
-  health_issues: ''
-});
+const profile = reactive({ full_name: '', email: '', phone: '', medical_notes: '' });
 
 onMounted(async () => {
-  try {
-    const response = await patientAPI.profile.get();
-    Object.assign(profile, response.data.data);
-  } catch (error) {
-    message.value = { type: 'error', text: 'Failed to load profile' };
-  }
+  try { const r = await patientAPI.profile.get(); Object.assign(profile, r.data.data); }
+  catch (e) { message.value = { type: 'error', text: 'Failed to load profile' }; }
 });
 
 const handleSave = async () => {
   loading.value = true;
-  try {
-    await patientAPI.profile.update(profile);
-    message.value = { type: 'success', text: 'Profile updated successfully' };
-  } catch (error) {
-    message.value = { type: 'error', text: 'Failed to update profile' };
-  } finally {
-    loading.value = false;
-  }
+  try { await patientAPI.profile.update(profile); message.value = { type: 'success', text: 'Profile updated' }; }
+  catch (e) { message.value = { type: 'error', text: 'Failed to update profile' }; }
+  finally { loading.value = false; }
 };
 </script>
+
+<style scoped>
+@import '../../styles/app.css';
+.eyebrow { color: rgba(201,168,76,0.55); font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.w-full { width: 100%; }
+.spinner { width:14px;height:14px;border:2px solid rgba(8,6,20,0.3);border-top-color:#080614;border-radius:50%;animation:spin .7s linear infinite;display:inline-block; }
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>

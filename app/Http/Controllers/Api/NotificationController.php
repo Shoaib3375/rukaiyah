@@ -6,9 +6,13 @@ use Illuminate\Http\JsonResponse;
 
 class NotificationController extends ApiController
 {
-    public function index(): JsonResponse
+    public function index(\Illuminate\Http\Request $request): JsonResponse
     {
-        $notifications = auth('api')->user()->notifications()->latest()->get();
+        $limit = min($request->query('limit', 20), 100);
+        $notifications = auth('api')->user()->notifications()
+            ->select(['id', 'user_id', 'type', 'data', 'read_at', 'created_at'])
+            ->latest()
+            ->paginate($limit);
         return $this->success($notifications);
     }
 

@@ -19,9 +19,9 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:3000')],
+    'allowed_origins' => array_filter(array_map('trim', explode(',', env('FRONTEND_URL', 'http://localhost:8000,http://127.0.0.1:8000')))),
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => ['localhost.*', '127\.0\.0\.1.*'],
 
     'allowed_headers' => ['*'],
 

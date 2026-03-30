@@ -10,7 +10,13 @@ class AdminUserController extends ApiController
 {
     public function index(): JsonResponse
     {
-        $users = User::with(['patientProfile', 'raqiProfile'])->paginate();
+        $limit = request()->input('limit', 15);
+        $limit = min($limit, 100); // Max 100 per page
+        
+        $users = User::select(['id', 'full_name', 'email', 'phone', 'role', 'is_active', 'created_at'])
+            ->with(['patientProfile:id,user_id', 'raqiProfile:id,user_id,is_approved,status'])
+            ->latest('created_at')
+            ->paginate($limit);
         return $this->success($users);
     }
 

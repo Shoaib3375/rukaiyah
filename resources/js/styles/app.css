@@ -1,0 +1,127 @@
+/* ── Page shell ── */
+.page { min-height: 100vh; background: #080614; color: #f5f0e8; padding: 2rem 1rem 4rem; }
+.page-inner    { max-width: 72rem; margin: 0 auto; }
+.page-inner-md { max-width: 52rem; margin: 0 auto; }
+.page-inner-sm { max-width: 36rem; margin: 0 auto; }
+
+/* ── Typography ── */
+.page-title { font-size: 1.75rem; font-weight: 300; color: #f5f0e8; letter-spacing: -0.01em; margin-bottom: 0.25rem; }
+.page-sub   { font-size: 0.85rem; color: rgba(245,240,232,0.35); margin-bottom: 2rem; }
+.eyebrow    { font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(201,168,76,0.55); margin-bottom: 0.5rem; }
+.sec-label  { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,240,232,0.3); margin-bottom: 0.75rem; }
+
+/* ── Cards ── */
+.card {
+  background: rgba(245,240,232,0.02);
+  border: 1px solid rgba(245,240,232,0.07);
+  border-radius: 0.875rem;
+  padding: 1.5rem;
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: rgba(201,168,76,0.2); }
+.card-gold {
+  background: rgba(245,240,232,0.02);
+  border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 0.875rem;
+  padding: 1.5rem;
+}
+
+/* ── Stat card ── */
+.stat-card { background: rgba(245,240,232,0.02); border: 1px solid rgba(245,240,232,0.07); border-radius: 0.875rem; padding: 1.5rem; transition: border-color 0.2s; }
+.stat-card:hover { border-color: rgba(201,168,76,0.2); }
+.stat-label { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,240,232,0.3); margin-bottom: 0.5rem; }
+.stat-value { font-size: 2rem; font-weight: 300; color: #c9a84c; line-height: 1; }
+
+/* ── Action cards ── */
+.action-card { display: block; background: rgba(245,240,232,0.02); border: 1px solid rgba(245,240,232,0.07); border-radius: 0.875rem; padding: 2rem; transition: all 0.25s; }
+.action-card:hover { background: rgba(201,168,76,0.05); border-color: rgba(201,168,76,0.25); transform: translateY(-2px); }
+.action-card-icon  { font-size: 1.75rem; margin-bottom: 0.75rem; }
+.action-card-title { font-size: 1rem; font-weight: 500; color: #f5f0e8; margin-bottom: 0.25rem; }
+.action-card-sub   { font-size: 0.8rem; color: rgba(245,240,232,0.35); }
+
+/* ── Table ── */
+.dark-table { width: 100%; border-collapse: collapse; }
+.dark-table thead tr { border-bottom: 1px solid rgba(245,240,232,0.07); }
+.dark-table th { padding: 0.75rem 1rem; text-align: left; font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,240,232,0.3); font-weight: 500; }
+.dark-table td { padding: 0.9rem 1rem; font-size: 0.85rem; color: rgba(245,240,232,0.65); border-bottom: 1px solid rgba(245,240,232,0.04); }
+.dark-table tbody tr:hover td { background: rgba(201,168,76,0.03); color: #f5f0e8; }
+
+/* ── Form fields ── */
+.field { display: flex; flex-direction: column; gap: 0.35rem; }
+.field label { font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,240,232,0.35); }
+.field input, .field select, .field textarea {
+  background: rgba(245,240,232,0.04); border: 1px solid rgba(245,240,232,0.1);
+  border-radius: 0.5rem; padding: 0.6rem 0.85rem;
+  color: #f5f0e8; font-size: 0.875rem; outline: none; width: 100%;
+  transition: border-color 0.2s, background 0.2s;
+}
+.field input::placeholder, .field textarea::placeholder { color: rgba(245,240,232,0.2); }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: rgba(201,168,76,0.4); background: rgba(201,168,76,0.04); }
+.field select option { background: #12102a; color: #f5f0e8; }
+
+/* ── Buttons ── */
+.btn-gold {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+  padding: 0.6rem 1.5rem; background: linear-gradient(135deg, #c9a84c, #b89940);
+  color: #080614; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
+  transition: all 0.2s; box-shadow: 0 0 20px rgba(201,168,76,0.12);
+}
+.btn-gold:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 0 30px rgba(201,168,76,0.28); }
+.btn-gold:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-ghost {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+  padding: 0.6rem 1.25rem; background: rgba(245,240,232,0.04);
+  border: 1px solid rgba(245,240,232,0.1); color: rgba(245,240,232,0.55);
+  border-radius: 0.5rem; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;
+}
+.btn-ghost:hover { border-color: rgba(245,240,232,0.22); color: #f5f0e8; background: rgba(245,240,232,0.07); }
+
+.btn-danger {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0.6rem 1.25rem; background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.22); color: rgba(252,165,165,0.85);
+  border-radius: 0.5rem; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;
+}
+.btn-danger:hover { background: rgba(239,68,68,0.16); border-color: rgba(239,68,68,0.38); }
+
+.btn-success {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0.6rem 1.25rem; background: rgba(34,197,94,0.08);
+  border: 1px solid rgba(34,197,94,0.22); color: rgba(134,239,172,0.85);
+  border-radius: 0.5rem; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;
+}
+.btn-success:hover { background: rgba(34,197,94,0.16); border-color: rgba(34,197,94,0.38); }
+
+/* ── Filter tabs ── */
+.filter-tabs { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.filter-tab { padding: 0.35rem 0.9rem; border-radius: 2rem; font-size: 0.72rem; letter-spacing: 0.05em; border: 1px solid rgba(245,240,232,0.08); color: rgba(245,240,232,0.38); background: transparent; cursor: pointer; transition: all 0.2s; }
+.filter-tab:hover { border-color: rgba(245,240,232,0.18); color: rgba(245,240,232,0.65); }
+.filter-tab.active { background: rgba(201,168,76,0.1); border-color: rgba(201,168,76,0.32); color: #c9a84c; }
+
+/* ── Badges ── */
+.badge { display: inline-block; padding: 0.18rem 0.6rem; border-radius: 2rem; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; }
+.badge-pending   { background: rgba(251,191,36,0.1);  border: 1px solid rgba(251,191,36,0.25); color: #fbbf24; }
+.badge-accepted  { background: rgba(34,197,94,0.1);   border: 1px solid rgba(34,197,94,0.25);  color: #4ade80; }
+.badge-completed { background: rgba(99,102,241,0.1);  border: 1px solid rgba(99,102,241,0.25); color: #a5b4fc; }
+.badge-canceled  { background: rgba(239,68,68,0.1);   border: 1px solid rgba(239,68,68,0.25);  color: #f87171; }
+.badge-declined  { background: rgba(239,68,68,0.1);   border: 1px solid rgba(239,68,68,0.25);  color: #f87171; }
+.badge-patient   { background: rgba(99,102,241,0.1);  border: 1px solid rgba(99,102,241,0.25); color: #a5b4fc; }
+.badge-raqi      { background: rgba(201,168,76,0.1);  border: 1px solid rgba(201,168,76,0.25); color: #c9a84c; }
+.badge-admin     { background: rgba(239,68,68,0.1);   border: 1px solid rgba(239,68,68,0.25);  color: #f87171; }
+.badge-new       { background: rgba(201,168,76,0.1);  border: 1px solid rgba(201,168,76,0.25); color: #c9a84c; }
+.badge-active    { background: rgba(34,197,94,0.1);   border: 1px solid rgba(34,197,94,0.25);  color: #4ade80; }
+.badge-suspended { background: rgba(239,68,68,0.1);   border: 1px solid rgba(239,68,68,0.25);  color: #f87171; }
+
+/* ── Alerts ── */
+.alert-error   { background: rgba(239,68,68,0.07);  border: 1px solid rgba(239,68,68,0.2);  color: rgba(252,165,165,0.9); border-radius: 0.5rem; padding: 0.75rem 1rem; font-size: 0.8rem; }
+.alert-success { background: rgba(34,197,94,0.07);  border: 1px solid rgba(34,197,94,0.2);  color: rgba(134,239,172,0.9); border-radius: 0.5rem; padding: 0.75rem 1rem; font-size: 0.8rem; }
+
+/* ── Misc ── */
+.back-link { display: inline-flex; align-items: center; gap: 0.4rem; color: rgba(245,240,232,0.3); font-size: 0.8rem; transition: color 0.2s; margin-bottom: 1.5rem; }
+.back-link:hover { color: rgba(245,240,232,0.65); }
+.empty-state { text-align: center; padding: 4rem 2rem; color: rgba(245,240,232,0.22); font-size: 0.875rem; }
+.divider { height: 1px; background: rgba(245,240,232,0.06); margin: 1.5rem 0; }
+.skeleton { background: rgba(245,240,232,0.05); border-radius: 0.5rem; animation: skpulse 1.5s ease-in-out infinite; }
+@keyframes skpulse { 0%,100%{opacity:1} 50%{opacity:0.35} }

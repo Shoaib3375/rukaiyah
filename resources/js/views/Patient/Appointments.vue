@@ -1,81 +1,53 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-12 px-4">
-    <div class="max-w-4xl mx-auto">
-      <h1 class="text-3xl font-bold mb-8">My Appointments</h1>
+  <div class="page">
+    <div class="page-inner-md">
+      <p class="eyebrow">Patient</p>
+      <h1 class="page-title">My Appointments</h1>
+      <p class="page-sub">Track and manage your healing sessions</p>
 
-      <!-- Filters -->
-      <div class="bg-white rounded-lg shadow p-4 mb-6 flex gap-2">
-        <button
-          v-for="status in ['all', 'pending', 'accepted', 'completed', 'canceled']"
-          :key="status"
-          @click="filterStatus = status"
-          :class="[
-            'px-4 py-2 rounded-lg font-medium transition',
-            filterStatus === status
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          ]"
-        >
-          {{ status.charAt(0).toUpperCase() + status.slice(1) }}
+      <div class="filter-tabs mb-6">
+        <button v-for="s in statuses" :key="s" @click="filterStatus = s"
+          :class="['filter-tab', filterStatus === s && 'active']">
+          {{ s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1) }}
         </button>
       </div>
 
-      <!-- Appointments List -->
-      <div v-if="filteredAppointments.length" class="space-y-4">
-        <div
-          v-for="apt in filteredAppointments"
-          :key="apt.id"
-          class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition"
-        >
-          <div class="flex justify-between items-start mb-4">
-            <div>
-              <h2 class="text-2xl font-bold">{{ apt.lead_raqi?.user?.full_name }}</h2>
-              <p class="text-gray-600">{{ apt.session_type }}</p>
-            </div>
-            <span :class="`px-4 py-2 rounded-full text-sm font-medium ${getStatusClass(apt.status)}`">
-              {{ apt.status }}
-            </span>
-          </div>
+      <div v-if="loading" class="space-y-3">
+        <div v-for="i in 4" :key="i" class="skeleton h-24"></div>
+      </div>
 
-          <div class="grid grid-cols-2 gap-4 mb-4">
+      <div v-else-if="filteredAppointments.length" class="space-y-3">
+        <div v-for="apt in filteredAppointments" :key="apt.id" class="card">
+          <div class="flex items-start justify-between mb-3">
             <div>
-              <p class="text-sm text-gray-600">Scheduled</p>
-              <p class="font-medium">{{ formatDateTime(apt.scheduled_at) }}</p>
+              <p class="font-medium text-cream/90">{{ apt.lead_raqi?.user?.full_name }}</p>
+              <p class="text-xs text-cream/35 mt-0.5 capitalize">{{ apt.session_type }}</p>
+            </div>
+            <span :class="`badge badge-${apt.status}`">{{ apt.status }}</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3 mb-4">
+            <div>
+              <p class="sec-label">Scheduled</p>
+              <p class="text-sm text-cream/70">{{ formatDateTime(apt.scheduled_at) }}</p>
             </div>
             <div>
-              <p class="text-sm text-gray-600">Duration</p>
-              <p class="font-medium">{{ apt.duration_minutes }} minutes</p>
+              <p class="sec-label">Duration</p>
+              <p class="text-sm text-cream/70">{{ apt.duration_minutes }} min</p>
             </div>
           </div>
-
-          <div v-if="apt.patient_notes" class="mb-4 p-3 bg-gray-50 rounded">
-            <p class="text-sm text-gray-600">Your Notes:</p>
-            <p class="text-gray-800">{{ apt.patient_notes }}</p>
+          <div v-if="apt.patient_notes" class="mb-4 p-3 rounded-lg bg-white/[0.03] text-xs text-cream/45 leading-relaxed">
+            {{ apt.patient_notes }}
           </div>
-
           <div class="flex gap-2">
-            <router-link
-              :to="`/patient/appointments/${apt.id}`"
-              class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 text-center font-middle"
-            >
-              View Details
-            </router-link>
-            <button
-              v-if="apt.status === 'pending'"
-              @click="cancelAppointment(apt.id)"
-              class="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 font-medium"
-            >
-              Cancel
-            </button>
+            <router-link :to="`/patient/appointments/${apt.id}`" class="btn-ghost text-xs">View Details</router-link>
+            <button v-if="apt.status === 'pending'" @click="cancelAppointment(apt.id)" class="btn-danger text-xs">Cancel</button>
           </div>
         </div>
       </div>
 
-      <div v-else class="bg-white rounded-lg shadow p-8 text-center">
-        <p class="text-gray-600 text-lg mb-4">No appointments found</p>
-        <router-link to="/patient/appointments/book" class="text-blue-600 hover:underline font-medium">
-          Book your first appointment
-        </router-link>
+      <div v-else class="card empty-state">
+        No appointments found.
+        <router-link to="/patient/appointments/book" class="block mt-2 text-gold text-sm hover:text-gold-light">Book your first session →</router-link>
       </div>
     </div>
   </div>
@@ -84,37 +56,38 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { patientAPI } from '../../api';
-import { formatDateTime, getStatusClass } from '../../utils';
+import { formatDateTime, unwrap } from '../../utils';
 
 const appointments = ref([]);
 const filterStatus = ref('all');
-const loading = ref(false);
+const loading = ref(true);
+const statuses = ['all', 'pending', 'accepted', 'completed', 'canceled'];
 
-const filteredAppointments = computed(() => {
-  if (filterStatus.value === 'all') return appointments.value;
-  return appointments.value.filter(a => a.status === filterStatus.value);
-});
+const filteredAppointments = computed(() =>
+  filterStatus.value === 'all' ? appointments.value
+    : appointments.value.filter(a => a.status === filterStatus.value)
+);
 
 onMounted(async () => {
-  loading.value = true;
   try {
-    const response = await patientAPI.appointments.list();
-    appointments.value = response.data.data;
-  } catch (error) {
-    console.error('Failed to load appointments:', error);
-  } finally {
-    loading.value = false;
-  }
+    const res = await patientAPI.appointments.list();
+    appointments.value = unwrap(res);
+  } catch (e) { console.error(e); } finally { loading.value = false; }
 });
 
 const cancelAppointment = async (id) => {
-  if (confirm('Are you sure you want to cancel this appointment?')) {
-    try {
-      await patientAPI.appointments.cancel(id);
-      appointments.value = appointments.value.filter(a => a.id !== id);
-    } catch (error) {
-      alert('Failed to cancel appointment');
-    }
-  }
+  if (!confirm('Cancel this appointment?')) return;
+  try {
+    await patientAPI.appointments.cancel(id);
+    appointments.value = appointments.value.filter(a => a.id !== id);
+  } catch (e) { alert('Failed to cancel'); }
 };
 </script>
+
+<style scoped>
+@import '../../styles/app.css';
+.text-cream { color: #f5f0e8; }
+.text-gold { color: #c9a84c; }
+.text-gold-light { color: #e8cc7a; }
+.eyebrow { color: rgba(201,168,76,0.55); font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase; margin-bottom: 0.5rem; }
+</style>

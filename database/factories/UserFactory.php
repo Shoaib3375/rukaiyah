@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\User;
+use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -27,11 +28,25 @@ class UserFactory extends Factory
         return [
             'full_name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
+            'phone' => fake()->phoneNumber(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'role' => \App\Enums\UserRole::Patient,
+            'role' => UserRole::Patient,
+            'is_active' => true,
+            'is_verified' => false,
             'remember_token' => Str::random(10),
         ];
+    }
+
+    /**
+     * Indicate that the user is verified.
+     */
+    public function verified(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'email_verified_at' => now(),
+            'is_verified' => true,
+        ]);
     }
 
     /**
@@ -41,6 +56,7 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+            'is_verified' => false,
         ]);
     }
 }

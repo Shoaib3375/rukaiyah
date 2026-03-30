@@ -1,66 +1,47 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-12 px-4">
-    <div class="max-w-7xl mx-auto">
-      <h1 class="text-3xl font-bold mb-8">All Appointments</h1>
+  <div class="page">
+    <div class="page-inner">
+      <p class="eyebrow">Admin</p>
+      <h1 class="page-title">Appointments</h1>
+      <p class="page-sub">All platform sessions at a glance</p>
 
-      <!-- Filters -->
-      <div class="bg-white rounded-lg shadow p-4 mb-6 flex gap-2">
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Search appointments..."
-          class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-        />
-        <select
-          v-model="statusFilter"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="accepted">Accepted</option>
-          <option value="completed">Completed</option>
-        </select>
+      <div class="flex gap-3 mb-6">
+        <div class="field flex-1" style="max-width:24rem">
+          <input v-model="searchQuery" type="text" placeholder="Search by patient or Raqi…" />
+        </div>
+        <div class="field" style="width:10rem">
+          <select v-model="statusFilter">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="completed">Completed</option>
+            <option value="canceled">Canceled</option>
+          </select>
+        </div>
       </div>
 
-      <!-- Appointments Table -->
-      <div class="bg-white rounded-lg shadow overflow-hidden">
-        <table class="w-full text-sm">
-          <thead class="bg-gray-100 border-b">
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="dark-table">
+          <thead>
             <tr>
-              <th class="px-6 py-3 text-left font-bold">Patient</th>
-              <th class="px-6 py-3 text-left font-bold">Raqi</th>
-              <th class="px-6 py-3 text-left font-bold">Date & Time</th>
-              <th class="px-6 py-3 text-left font-bold">Type</th>
-              <th class="px-6 py-3 text-left font-bold">Status</th>
-              <th class="px-6 py-3 text-left font-bold">Actions</th>
+              <th>Patient</th>
+              <th>Raqi</th>
+              <th>Date & Time</th>
+              <th>Type</th>
+              <th>Status</th>
             </tr>
           </thead>
-          <tbody class="divide-y">
-            <tr v-for="apt in filteredAppointments" :key="apt.id" class="hover:bg-gray-50">
-              <td class="px-6 py-4 font-medium">{{ apt.patient_profile?.user?.full_name }}</td>
-              <td class="px-6 py-4">{{ apt.lead_raqi?.user?.full_name }}</td>
-              <td class="px-6 py-4">{{ formatDateTime(apt.scheduled_at) }}</td>
-              <td class="px-6 py-4">{{ apt.session_type }}</td>
-              <td class="px-6 py-4">
-                <span :class="`px-3 py-1 rounded-full text-xs font-medium ${getStatusClass(apt.status)}`">
-                  {{ apt.status }}
-                </span>
-              </td>
-              <td class="px-6 py-4 flex gap-2">
-                <button
-                  @click="viewDetail(apt.id)"
-                  class="text-blue-600 hover:underline"
-                >
-                  View
-                </button>
-              </td>
+          <tbody>
+            <tr v-for="apt in filteredAppointments" :key="apt.id">
+              <td style="color:rgba(245,240,232,0.85)" class="font-medium">{{ apt.patient_profile?.user?.full_name }}</td>
+              <td>{{ apt.lead_raqi?.user?.full_name }}</td>
+              <td>{{ formatDateTime(apt.scheduled_at) }}</td>
+              <td class="capitalize">{{ apt.session_type }}</td>
+              <td><span :class="`badge badge-${apt.status}`">{{ apt.status }}</span></td>
             </tr>
           </tbody>
         </table>
-      </div>
-
-      <div v-if="filteredAppointments.length === 0" class="bg-white rounded-lg shadow p-8 text-center mt-4">
-        <p class="text-gray-600">No appointments found</p>
+        <div v-if="!filteredAppointments.length" class="empty-state">No appointments found</div>
       </div>
     </div>
   </div>
@@ -68,34 +49,29 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import { adminAPI } from '../../api';
-import { formatDateTime, getStatusClass } from '../../utils';
+import { formatDateTime, unwrap } from '../../utils';
 
-const router = useRouter();
 const appointments = ref([]);
 const searchQuery = ref('');
 const statusFilter = ref('');
 
-const filteredAppointments = computed(() => {
-  return appointments.value.filter(apt =>
-    (apt.patient_profile?.user?.full_name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-     apt.lead_raqi?.user?.full_name.toLowerCase().includes(searchQuery.value.toLowerCase())) &&
+const filteredAppointments = computed(() =>
+  appointments.value.filter(apt =>
+    (apt.patient_profile?.user?.full_name?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+     apt.lead_raqi?.user?.full_name?.toLowerCase().includes(searchQuery.value.toLowerCase())) &&
     (!statusFilter.value || apt.status === statusFilter.value)
-  );
-});
+  )
+);
 
 onMounted(async () => {
-  try {
-    const response = await adminAPI.appointments.list({});
-    appointments.value = response.data.data;
-  } catch (error) {
-    console.error('Failed to load appointments:', error);
-  }
+  try { const r = await adminAPI.appointments.list({}); appointments.value = unwrap(r); }
+  catch (e) { console.error(e); }
 });
-
-const viewDetail = (id) => {
-  // Navigate to detail view or modal
-  console.log('View appointment:', id);
-};
 </script>
+
+<style scoped>
+@import '../../styles/app.css';
+.eyebrow { color: rgba(201,168,76,0.55); font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.flex-1 { flex: 1; }
+</style>

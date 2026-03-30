@@ -1,5 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { isAuthenticated, userRole } from './store';
+import { isAuthenticated, userRole, authReady, initAuth } from './store';
+
+// Landing
+import Landing from './views/Landing.vue';
 
 // Auth views
 import Login from './views/Auth/Login.vue';
@@ -76,7 +79,8 @@ const routes = [
     ]
   },
 
-  { path: '/', redirect: '/patient' }
+  // Landing
+  { path: '/', name: 'home', component: Landing, meta: { requiresGuest: false } }
 ];
 
 const router = createRouter({
@@ -85,7 +89,11 @@ const router = createRouter({
 });
 
 // Route guards
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+  if (!authReady.value) {
+    await initAuth();
+  }
+
   const requiresAuth = to.meta.requiresAuth;
   const requiresGuest = to.meta.requiresGuest;
   const requiredRole = to.meta.role;

@@ -17,15 +17,25 @@ class AppointmentController extends ApiController
         $this->appointmentService = $appointmentService;
     }
 
-    public function patientIndex(): JsonResponse
+    public function patientIndex(Request $request): JsonResponse
     {
-        $appointments = auth('api')->user()->appointments()->with('leadRaqi.user')->get();
+        $limit = min($request->query('limit', 10), 100);
+        $appointments = auth('api')->user()->appointments()
+            ->select(['id', 'patient_id', 'lead_raqi_id', 'session_type', 'status', 'scheduled_at', 'created_at'])
+            ->with('leadRaqi:id,user_id', 'leadRaqi.user:id,full_name')
+            ->latest('scheduled_at')
+            ->paginate($limit);
         return $this->success($appointments);
     }
 
-    public function raqiIndex(): JsonResponse
+    public function raqiIndex(Request $request): JsonResponse
     {
-        $appointments = auth('api')->user()->raqiProfile->appointments()->with('patient')->get();
+        $limit = min($request->query('limit', 10), 100);
+        $appointments = auth('api')->user()->raqiProfile->appointments()
+            ->select(['id', 'patient_id', 'lead_raqi_id', 'session_type', 'status', 'scheduled_at', 'created_at'])
+            ->with('patient:id,user_id', 'patient.user:id,full_name')
+            ->latest('scheduled_at')
+            ->paginate($limit);
         return $this->success($appointments);
     }
 

@@ -1,3 +1,11 @@
+// Unwrap Laravel paginated OR plain API response → always returns an array
+export const unwrap = (response) => {
+    const d = response?.data?.data;
+    if (Array.isArray(d)) return d;        // plain list
+    if (Array.isArray(d?.data)) return d.data; // paginated
+    return [];
+};
+
 export const formatDate = (date) => {
     if (!date) return '';
     return new Date(date).toLocaleDateString('en-US', {

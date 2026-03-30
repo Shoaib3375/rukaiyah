@@ -5,15 +5,19 @@ namespace App\Http\Controllers\Api;
 use App\Models\RaqiProfile;
 use App\Enums\RaqiStatus;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class RaqiController extends ApiController
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $raqis = RaqiProfile::with('user')
+        $limit = min($request->query('limit', 12), 100);
+        $raqis = RaqiProfile::select(['id', 'user_id', 'specialization', 'bio', 'is_approved', 'status', 'rating', 'total_reviews'])
+            ->with('user:id,full_name,email,phone')
             ->where('is_approved', true)
             ->where('status', RaqiStatus::Active)
-            ->get();
+            ->latest('rating')
+            ->paginate($limit);
 
         return $this->success($raqis);
     }

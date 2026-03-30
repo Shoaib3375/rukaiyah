@@ -1,55 +1,32 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-12 px-4">
-    <div class="max-w-7xl mx-auto">
-      <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
-        <p class="text-gray-600">Manage users, Raqis, and platform analytics</p>
+  <div class="page">
+    <div class="page-inner">
+      <p class="eyebrow">Admin</p>
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-sub">Platform overview and management</p>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value">{{ stats.totalUsers }}</div></div>
+        <div class="stat-card"><div class="stat-label">Active Raqis</div><div class="stat-value" style="color:#4ade80">{{ stats.activeRaqis }}</div></div>
+        <div class="stat-card"><div class="stat-label">Pending Approvals</div><div class="stat-value" style="color:#fbbf24">{{ stats.pendingRaqis }}</div></div>
+        <div class="stat-card"><div class="stat-label">Appointments</div><div class="stat-value" style="color:#a5b4fc">{{ stats.totalAppointments }}</div></div>
       </div>
 
-      <!-- Stats Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow p-6">
-          <h3 class="text-gray-500 text-sm font-medium">Total Users</h3>
-          <p class="text-3xl font-bold text-blue-600 mt-2">{{ stats.totalUsers }}</p>
-        </div>
-        <div class="bg-white rounded-lg shadow p-6">
-          <h3 class="text-gray-500 text-sm font-medium">Active Raqis</h3>
-          <p class="text-3xl font-bold text-green-600 mt-2">{{ stats.activeRaqis }}</p>
-        </div>
-        <div class="bg-white rounded-lg shadow p-6">
-          <h3 class="text-gray-500 text-sm font-medium">Pending Approvals</h3>
-          <p class="text-3xl font-bold text-yellow-600 mt-2">{{ stats.pendingRaqis }}</p>
-        </div>
-        <div class="bg-white rounded-lg shadow p-6">
-          <h3 class="text-gray-500 text-sm font-medium">Total Appointments</h3>
-          <p class="text-3xl font-bold text-purple-600 mt-2">{{ stats.totalAppointments }}</p>
-        </div>
-      </div>
-
-      <!-- Quick Links -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <router-link
-          to="/admin/raqis"
-          class="bg-yellow-600 text-white rounded-lg shadow-lg p-8 hover:bg-yellow-700 transition"
-        >
-          <h2 class="text-2xl font-bold mb-2">⭐ Pending Approvals</h2>
-          <p class="text-yellow-100">Review and approve new Raqis</p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <router-link to="/admin/raqis" class="action-card">
+          <div class="action-card-icon">⭐</div>
+          <div class="action-card-title">Pending Approvals</div>
+          <div class="action-card-sub">Review and approve new Raqis</div>
         </router-link>
-
-        <router-link
-          to="/admin/users"
-          class="bg-blue-600 text-white rounded-lg shadow-lg p-8 hover:bg-blue-700 transition"
-        >
-          <h2 class="text-2xl font-bold mb-2">👥 Users</h2>
-          <p class="text-blue-100">Manage user accounts</p>
+        <router-link to="/admin/users" class="action-card">
+          <div class="action-card-icon">👥</div>
+          <div class="action-card-title">Users</div>
+          <div class="action-card-sub">Manage all user accounts</div>
         </router-link>
-
-        <router-link
-          to="/admin/appointments"
-          class="bg-purple-600 text-white rounded-lg shadow-lg p-8 hover:bg-purple-700 transition"
-        >
-          <h2 class="text-2xl font-bold mb-2">📅 Appointments</h2>
-          <p class="text-purple-100">View all appointments</p>
+        <router-link to="/admin/appointments" class="action-card">
+          <div class="action-card-icon">📅</div>
+          <div class="action-card-title">Appointments</div>
+          <div class="action-card-sub">View all platform sessions</div>
         </router-link>
       </div>
     </div>
@@ -60,19 +37,15 @@
 import { ref, onMounted } from 'vue';
 import { adminAPI } from '../../api';
 
-const stats = ref({
-  totalUsers: 0,
-  activeRaqis: 0,
-  pendingRaqis: 0,
-  totalAppointments: 0
-});
+const stats = ref({ totalUsers: 0, activeRaqis: 0, pendingRaqis: 0, totalAppointments: 0 });
 
 onMounted(async () => {
-  try {
-    const response = await adminAPI.stats.index();
-    stats.value = response.data.data;
-  } catch (error) {
-    console.error('Failed to load stats:', error);
-  }
+  try { const r = await adminAPI.stats.index(); stats.value = r.data.data; }
+  catch (e) { console.error(e); }
 });
 </script>
+
+<style scoped>
+@import '../../styles/app.css';
+.eyebrow { color: rgba(201,168,76,0.55); font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase; margin-bottom: 0.5rem; }
+</style>

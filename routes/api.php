@@ -70,6 +70,7 @@ Route::prefix('v1')->group(function () {
         Route::get('users/{user}',                 [AdminUserController::class, 'show']);
         Route::put('users/{user}/activate',        [AdminUserController::class, 'activate']);
         Route::get('raqis/pending',                [AdminRaqiController::class, 'pending']);
+        Route::get('raqis/approved',               [AdminRaqiController::class, 'approved']);
         Route::put('raqis/{raqi}/approve',         [AdminRaqiController::class, 'approve']);
         Route::put('raqis/{raqi}/suspend',         [AdminRaqiController::class, 'suspend']);
         Route::get('appointments',                 [AdminAppointmentController::class, 'index']);

@@ -19,7 +19,9 @@ export const initializeReverb = () => {
         authEndpoint: '/api/broadcasting/auth',
         auth: {
             headers: {
-                Authorization: `Bearer ${token.value}`
+                get Authorization() {
+                    return `Bearer ${token.value}`;
+                }
             }
         }
     });
