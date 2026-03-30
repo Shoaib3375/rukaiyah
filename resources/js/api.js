@@ -66,7 +66,8 @@ export const patientAPI = {
     },
     raqis: {
         list: () => api.get('/patient/raqis'),
-        get: (id) => api.get(`/patient/raqis/${id}`)
+        get: (id) => api.get(`/patient/raqis/${id}`),
+        getAvailableSlots: (id, params) => api.get(`/patient/raqis/${id}/available-slots`, { params })
     },
     reviews: {
         create: (data) => api.post('/patient/reviews', data)

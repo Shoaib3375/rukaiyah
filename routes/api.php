@@ -41,6 +41,7 @@ Route::prefix('v1')->group(function () {
         Route::delete('appointments/{appointment}',      [AppointmentController::class, 'cancel']);
         Route::get ('raqis',                             [RaqiController::class, 'index']);
         Route::get ('raqis/{raqi}',                      [RaqiController::class, 'show']);
+        Route::get ('raqis/{raqi}/available-slots',      [RaqiController::class, 'availableSlots']);
         Route::post('reviews',                           [ReviewController::class, 'store']);
         Route::get ('notifications',                     [NotificationController::class, 'index']);
         Route::put ('notifications/{notification}/read', [NotificationController::class, 'markRead']);

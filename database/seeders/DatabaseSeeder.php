@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\UserRole;
+use App\Models\Availability;
 use App\Models\PatientProfile;
 use App\Models\RaqiProfile;
 use App\Models\User;
@@ -52,7 +53,17 @@ class DatabaseSeeder extends Seeder
             ])
             ->create()
             ->each(function (User $user) {
-                RaqiProfile::factory()->create(['user_id' => $user->id]);
+                $raqi = RaqiProfile::factory()->create(['user_id' => $user->id]);
+                // Create availability for Monday-Friday, 9AM-5PM
+                for ($day = 0; $day < 5; $day++) { // 0=Monday, 4=Friday
+                    Availability::create([
+                        'raqi_id' => $raqi->id,
+                        'day_of_week' => $day,
+                        'slot_start' => '09:00',
+                        'slot_end' => '17:00',
+                        'is_blocked' => false,
+                    ]);
+                }
             });
 
         // Create 3 pending Raqis (not yet approved)

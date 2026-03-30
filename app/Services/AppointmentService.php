@@ -52,6 +52,67 @@ class AppointmentService
         // NotificationService::notify($appointment->leadRaqi->user, 'Appointment Cancelled', '...', $appointment);
     }
 
+    public function getAvailableSlots(string $raqiId, string $date, int $durationMinutes = 60): array
+    {
+        $date = Carbon::parse($date)->startOfDay();
+        // Convert Carbon's dayOfWeek (Sun=0) to app's format (Mon=0, Sun=6)
+        $dayOfWeek = ($date->dayOfWeek + 6) % 7;
+
+        // Get raqi's availability for this day
+        $availabilities = $this->getRaqiAvailability($raqiId, $dayOfWeek);
+
+        if ($availabilities->isEmpty()) {
+            return [];
+        }
+
+        $slots = [];
+        $duration = $durationMinutes;
+
+        foreach ($availabilities as $availability) {
+            if ($availability->is_blocked) {
+                continue;
+            }
+
+            $slotStart = $date->copy()->setTimeFromTimeString($availability->slot_start);
+            $slotEnd = $date->copy()->setTimeFromTimeString($availability->slot_end);
+
+            // Generate 30-minute intervals for booking
+            while ($slotStart->copy()->addMinutes($duration)->lte($slotEnd)) {
+                $appointmentEnd = $slotStart->copy()->addMinutes($duration);
+
+                // Check for conflicts with existing appointments
+                $hasConflict = Appointment::where('lead_raqi_id', $raqiId)
+                    ->whereIn('status', [AppointmentStatus::Pending, AppointmentStatus::Confirmed])
+                    ->where(function ($q) use ($slotStart, $appointmentEnd) {
+                        $q->whereBetween('scheduled_at', [$slotStart, $appointmentEnd->copy()->subSecond()])
+                          ->orWhere(function ($q) use ($slotStart, $appointmentEnd) {
+                              $q->whereRaw("scheduled_at + (duration_minutes * interval '1 minute') > ?", [$slotStart])
+                                ->whereRaw("scheduled_at < ?", [$appointmentEnd]);
+                          });
+                    })->exists();
+
+                if (!$hasConflict) {
+                    $slots[] = [
+                        'start' => $slotStart->toIso8601String(),
+                        'end' => $appointmentEnd->toIso8601String(),
+                        'display' => $slotStart->format('H:i') . ' – ' . $appointmentEnd->format('H:i'),
+                    ];
+                }
+
+                $slotStart->addMinutes(30);
+            }
+        }
+
+        return $slots;
+    }
+
+    private function getRaqiAvailability($raqiId, $dayOfWeek)
+    {
+        return \App\Models\Availability::where('raqi_id', $raqiId)
+            ->where('day_of_week', $dayOfWeek)
+            ->get();
+    }
+
     private function checkAvailability(string $raqiId, string $scheduledAt, int $duration): void
     {
         $start = Carbon::parse($scheduledAt);
