@@ -21,7 +21,7 @@ class AppointmentController extends ApiController
     {
         $limit = min($request->query('limit', 10), 100);
         $appointments = auth('api')->user()->appointments()
-            ->select(['id', 'patient_id', 'lead_raqi_id', 'session_type', 'status', 'scheduled_at', 'created_at'])
+            ->select(['id', 'patient_id', 'lead_raqi_id', 'session_type', 'status', 'scheduled_at', 'duration_minutes', 'patient_notes', 'created_at'])
             ->with('leadRaqi:id,user_id', 'leadRaqi.user:id,full_name')
             ->latest('scheduled_at')
             ->paginate($limit);
@@ -32,8 +32,8 @@ class AppointmentController extends ApiController
     {
         $limit = min($request->query('limit', 10), 100);
         $appointments = auth('api')->user()->raqiProfile->appointments()
-            ->select(['id', 'patient_id', 'lead_raqi_id', 'session_type', 'status', 'scheduled_at', 'created_at'])
-            ->with('patient:id,user_id', 'patient.user:id,full_name')
+            ->select(['id', 'patient_id', 'lead_raqi_id', 'session_type', 'status', 'scheduled_at', 'duration_minutes', 'created_at'])
+            ->with('patient:id,full_name')
             ->latest('scheduled_at')
             ->paginate($limit);
         return $this->success($appointments);

@@ -17,6 +17,12 @@ class AppointmentPolicy
             || $user->role === UserRole::Admin;
     }
 
+    public function update(User $user, Appointment $appointment): bool
+    {
+        return $user->raqiProfile?->id === $appointment->lead_raqi_id
+            || $user->role === UserRole::Admin;
+    }
+
     public function cancel(User $user, Appointment $appointment): bool
     {
         return $user->id === $appointment->patient_id && $appointment->isCancellable();

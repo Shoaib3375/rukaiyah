@@ -61,7 +61,7 @@ import { formatDateTime, unwrap } from '../../utils';
 const appointments = ref([]);
 const filterStatus = ref('all');
 const loading = ref(true);
-const statuses = ['all', 'pending', 'accepted', 'completed', 'canceled'];
+const statuses = ['all', 'pending', 'confirmed', 'completed', 'cancelled'];
 
 const filteredAppointments = computed(() =>
   filterStatus.value === 'all' ? appointments.value

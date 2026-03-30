@@ -21,7 +21,7 @@
           :to="`/raqi/sessions/${apt.id}`" class="card apt-row">
           <div class="flex items-start justify-between mb-2">
             <div>
-              <p class="font-medium text-cream/90">{{ apt.patient_profile?.user?.full_name }}</p>
+              <p class="font-medium text-cream/90">{{ apt.patient?.full_name }}</p>
               <p class="text-xs text-cream/35 mt-0.5 capitalize">{{ apt.session_type }}</p>
             </div>
             <span :class="`badge badge-${apt.status}`">{{ apt.status }}</span>
@@ -52,7 +52,7 @@ import { formatDateTime, unwrap } from '../../utils';
 const appointments = ref([]);
 const filterStatus = ref('all');
 const loading = ref(true);
-const statuses = ['all', 'pending', 'accepted', 'completed'];
+const statuses = ['all', 'pending', 'confirmed', 'completed'];
 
 const filteredAppointments = computed(() =>
   filterStatus.value === 'all' ? appointments.value
