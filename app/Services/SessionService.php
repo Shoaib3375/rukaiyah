@@ -10,6 +10,7 @@ use App\Enums\AppointmentStatus;
 use App\Enums\ParticipantRole;
 use App\Enums\InviteStatus;
 use App\Enums\RaqiStatus;
+use Illuminate\Support\Str;
 
 class SessionService
 {
@@ -31,6 +32,7 @@ class SessionService
             'role'          => ParticipantRole::CoRaqi,
             'invite_status' => InviteStatus::Pending,
             'invited_at'    => now(),
+            'invite_token'  => Str::uuid(),
         ]);
 
         event(new \App\Events\CoRaqiInvited($participant));

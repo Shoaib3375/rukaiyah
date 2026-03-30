@@ -19,6 +19,7 @@ class SessionParticipant extends Model
         'invite_status',
         'invited_at',
         'joined_at',
+        'invite_token',
     ];
 
     protected $casts = [

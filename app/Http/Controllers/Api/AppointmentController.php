@@ -56,4 +56,25 @@ class AppointmentController extends ApiController
             return $this->error($e->getMessage());
         }
     }
+
+    public function accept(Appointment $appointment): JsonResponse
+    {
+        $this->authorize('update', $appointment);
+        $appointment->update(['status' => 'confirmed']);
+        return $this->success(null, 'Appointment accepted.');
+    }
+
+    public function decline(Appointment $appointment): JsonResponse
+    {
+        $this->authorize('update', $appointment);
+        $appointment->update(['status' => 'cancelled']);
+        return $this->success(null, 'Appointment declined.');
+    }
+
+    public function complete(Appointment $appointment): JsonResponse
+    {
+        $this->authorize('complete', $appointment);
+        $appointment->update(['status' => 'completed']);
+        return $this->success(null, 'Appointment completed.');
+    }
 }
