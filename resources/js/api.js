@@ -92,13 +92,15 @@ export const raqiAPI = {
     appointments: {
         list: () => api.get('/raqi/appointments'),
         get: (id) => api.get(`/raqi/appointments/${id}`),
+        update: (id, data) => api.put(`/raqi/appointments/${id}`, data),
         accept: (id) => api.put(`/raqi/appointments/${id}/accept`),
         decline: (id) => api.put(`/raqi/appointments/${id}/decline`),
         complete: (id) => api.put(`/raqi/appointments/${id}/complete`)
     },
     participants: {
         list: (appointmentId) => api.get(`/raqi/appointments/${appointmentId}/participants`),
-        invite: (appointmentId, data) => api.post(`/raqi/appointments/${appointmentId}/invite`, data)
+        invite: (appointmentId, data) => api.post(`/raqi/appointments/${appointmentId}/invite`, data),
+        remove: (appointmentId, participantId) => api.delete(`/raqi/appointments/${appointmentId}/participants/${participantId}`)
     },
     notes: {
         list: (appointmentId) => api.get(`/raqi/appointments/${appointmentId}/notes`),

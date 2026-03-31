@@ -1,8 +1,22 @@
 // Unwrap Laravel API response → returns array for lists, object for details
 export const unwrap = (response) => {
-    const d = response?.data?.data;
-    if (d?.data && Array.isArray(d.data)) return d.data; // paginated
-    return d; // plain object or array
+    // If response is null/undefined
+    if (!response) return null;
+    
+    // Axios data envelope
+    const dataEnvelope = response.data;
+    if (!dataEnvelope || dataEnvelope.success === false) return null;
+
+    // The actual payload
+    const payload = dataEnvelope.data;
+    
+    // Check for pagination: { data: { data: [...] } }
+    if (payload && payload.data && Array.isArray(payload.data)) {
+        return payload.data;
+    }
+
+    // Return payload as is (could be object, simple array, or null)
+    return payload;
 };
 
 export const formatDate = (date) => {

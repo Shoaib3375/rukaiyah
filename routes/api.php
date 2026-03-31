@@ -53,10 +53,13 @@ Route::prefix('v1')->group(function () {
         Route::put('profile',  [RaqiProfileController::class, 'update']);
         Route::apiResource('availability', AvailabilityController::class);
         Route::get ('appointments',                               [AppointmentController::class, 'raqiIndex']);
+        Route::get ('appointments/{appointment}',                 [AppointmentController::class, 'show']);
+        Route::put ('appointments/{appointment}',                 [AppointmentController::class, 'update']);
         Route::put ('appointments/{appointment}/accept',          [AppointmentController::class, 'accept']);
         Route::put ('appointments/{appointment}/decline',         [AppointmentController::class, 'decline']);
         Route::put ('appointments/{appointment}/complete',        [AppointmentController::class, 'complete']);
         Route::post('appointments/{appointment}/invite',          [SessionParticipantController::class, 'invite']);
+        Route::delete('appointments/{appointment}/participants/{participant}', [SessionParticipantController::class, 'destroy']);
         Route::get ('appointments/{appointment}/participants',    [SessionParticipantController::class, 'index']);
         Route::get ('appointments/{appointment}/notes',           [SessionNoteController::class, 'index']);
         Route::post('appointments/{appointment}/notes',           [SessionNoteController::class, 'store']);

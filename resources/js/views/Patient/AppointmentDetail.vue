@@ -110,6 +110,35 @@
               </div>
             </div>
 
+            <!-- SESSION ROOM / LINK -->
+            <div v-if="appointment.status === 'confirmed'" class="d-card">
+              <div class="d-card-head">
+                <div class="d-card-title"><span class="d-card-title-icon">🔗</span> Session Access</div>
+              </div>
+              <div class="d-card-body">
+                <div v-if="appointment.meeting_link" class="p-4 rounded-lg bg-gold/5 border border-gold/20 mb-4">
+                  <p class="sec-label mb-2" style="color:var(--gold);">Meeting Link Ready</p>
+                  <p class="text-sm text-cream/70 mb-4">Your Raqi has provided the session link. Click below to join when it's time.</p>
+                  <a :href="appointment.meeting_link" target="_blank" class="btn btn-primary" style="text-decoration:none;">
+                    🎥 Join Video Session
+                  </a>
+                </div>
+                <div v-else class="empty-notes" style="padding:10px 0;">
+                  The meeting link will appear here once your Raqi provides it.
+                </div>
+
+                <!-- Instructions -->
+                <div v-if="appointment.patient_instructions" style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(201,168,76,0.13);">
+                  <div class="info-label" style="margin-bottom:8px;color:var(--gold);">Instructions from Raqi</div>
+                  <div class="patient-note-box" style="border-left-color:#2ecc71;background:rgba(26,171,122,0.05);">
+                    <div class="patient-note-text" style="color:var(--white-dim);">
+                      {{ appointment.patient_instructions }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- YOUR NOTES -->
             <div class="d-card">
               <div class="d-card-head">
@@ -330,7 +359,11 @@ const cancelAppointment = async () => {
 };
 
 const joinSession = () => {
-  alert('Joining video session...');
+  if (appointment.value && appointment.value.meeting_link) {
+    window.open(appointment.value.meeting_link, '_blank');
+  } else {
+    alert('Meeting link is not available yet.');
+  }
 };
 
 const addToCalendar = () => {

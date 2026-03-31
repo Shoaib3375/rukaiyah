@@ -55,6 +55,20 @@ class AppointmentController extends ApiController
         return $this->success($appointment->load(['patient', 'leadRaqi.user', 'participants.raqi.user', 'notes.raqi.user', 'followUp']));
     }
 
+    public function update(Request $request, Appointment $appointment): JsonResponse
+    {
+        $this->authorize('update', $appointment);
+        $validated = $request->validate([
+            'meeting_link' => 'nullable|url|max:255',
+            'patient_instructions' => 'nullable|string',
+            'raqi_notes' => 'nullable|string',
+            'ailment' => 'nullable|string|max:255',
+        ]);
+
+        $appointment->update($validated);
+        return $this->success($appointment, 'Appointment updated successfully.');
+    }
+
     public function cancel(Appointment $appointment): JsonResponse
     {
         $this->authorize('cancel', $appointment);

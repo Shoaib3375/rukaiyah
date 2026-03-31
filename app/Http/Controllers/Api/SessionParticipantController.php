@@ -22,4 +22,16 @@ class SessionParticipantController extends ApiController
         $participant = SessionService::inviteCoRaqi($appointment, $request->raqi_id, auth('api')->user());
         return $this->success($participant, 'Co-Raqi invited successfully.', 201);
     }
+
+    public function destroy(Appointment $appointment, SessionParticipant $participant): JsonResponse
+    {
+        $this->authorize('invite', $appointment); // Uses same authorization as invite (lead raqi)
+
+        if ($participant->appointment_id !== $appointment->id) {
+            return $this->error('Participant not found in this session.', 404);
+        }
+
+        $participant->delete();
+        return $this->success(null, 'Co-Raqi removed successfully.');
+    }
 }
