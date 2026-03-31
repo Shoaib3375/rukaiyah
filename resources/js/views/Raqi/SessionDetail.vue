@@ -9,7 +9,8 @@
         <div class="page-header">
           <div>
             <h1 class="page-title">Session Details</h1>
-            <div v-if="appointment.id" class="page-meta">ID: #APPT-{{ appointment.id.split('-')[0].toUpperCase() }} &nbsp;·&nbsp; Booked {{ formatDate(appointment.created_at) }}</div>
+            <div v-if="appointment.id && typeof appointment.id === 'string'" class="page-meta">ID: #APPT-{{ appointment.id.split('-')[0].toUpperCase() }} &nbsp;·&nbsp; Booked {{ formatDate(appointment.created_at) }}</div>
+            <div v-else-if="appointment.id" class="page-meta">ID: #APPT-{{ String(appointment.id).padStart(4, '0') }} &nbsp;·&nbsp; Booked {{ formatDate(appointment.created_at) }}</div>
           </div>
           <div class="header-actions">
             <span :class="['sbadge', appointment.status]">{{ appointment.status }}</span>
@@ -232,6 +233,7 @@
                       <div class="cr-spec">{{ p.raqi?.specialization }}</div>
                     </div>
                     <span :class="['cr-badge', p.role, p.invite_status]">{{ p.invite_status }}</span>
+                    <button v-if="appointment.status === 'confirmed' && appointment.lead_raqi_id === currentUser?.raqi_profile?.id && p.raqi_id !== appointment.lead_raqi_id" class="cr-remove" style="color:var(--white-faint);border:none;background:none;cursor:pointer;padding:4px 8px;" @click="removeCoRaqi(p.id)">✕</button>
                   </div>
                 </div>
 
@@ -268,7 +270,8 @@
                 <div class="qi-row"><span class="qi-label">Patient</span><span class="qi-value">{{ appointment.patient?.full_name }}</span></div>
                 <div class="qi-row"><span class="qi-label">Ailment</span><span class="qi-value">{{ appointment.ailment || 'General' }}</span></div>
                 <div class="qi-row"><span class="qi-label">Co-Raqis</span><span class="qi-value gold">{{ participants.length - 1 }} assigned</span></div>
-                <div v-if="appointment.id" class="qi-row"><span class="qi-label">Session ID</span><span class="qi-value" style="font-size:.72rem;">APPT-{{ appointment.id.split('-')[0].toUpperCase() }}</span></div>
+                <div v-if="appointment.id && typeof appointment.id === 'string'" class="qi-row"><span class="qi-label">Session ID</span><span class="qi-value" style="font-size:.72rem;">APPT-{{ appointment.id.split('-')[0].toUpperCase() }}</span></div>
+                <div v-else-if="appointment.id" class="qi-row"><span class="qi-label">Session ID</span><span class="qi-value" style="font-size:.72rem;">APPT-{{ String(appointment.id).padStart(4, '0') }}</span></div>
                 <div class="qi-row"><span class="qi-label">Fee</span><span class="qi-value gold">৳ 1,500</span></div>
               </div>
             </div>
@@ -352,6 +355,7 @@ onMounted(async () => {
     }
   } catch (e) {
     console.error(e);
+    alert('Error Loading Page: ' + (e.response ? JSON.stringify(e.response.data) : e.message));
   } finally {
     loading.value = false;
   }
@@ -403,6 +407,15 @@ const inviteCoRaqi = async (raqiId) => {
     participants.value = unwrap(res);
     toast('Invite sent', '👥');
   } catch (e) { toast('Failed to invite', '✕'); }
+};
+
+const removeCoRaqi = async (participantId) => {
+  if (!confirm('Remove this co-Raqi from the session?')) return;
+  try {
+    await raqiAPI.participants.remove(route.params.id, participantId);
+    participants.value = participants.value.filter(p => p.id !== participantId);
+    toast('Co-Raqi removed', '✕');
+  } catch (e) { toast('Failed to remove co-Raqi', '✕'); }
 };
 
 const scheduleFollowUp = async () => {
