@@ -52,7 +52,7 @@ class AppointmentController extends ApiController
     public function show(Appointment $appointment): JsonResponse
     {
         $this->authorize('view', $appointment);
-        return $this->success($appointment->load(['patient', 'leadRaqi.user', 'participants.raqi.user']));
+        return $this->success($appointment->load(['patient', 'leadRaqi.user', 'participants.raqi.user', 'notes.raqi.user', 'followUp']));
     }
 
     public function cancel(Appointment $appointment): JsonResponse

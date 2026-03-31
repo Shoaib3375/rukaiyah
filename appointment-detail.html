@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Appointment Details — Jetty Healing</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --void:       #0a0814;
+  --deep:       #0f0d1e;
+  --card:       #141228;
+  --card2:      #181535;
+  --border:     rgba(201,168,76,0.13);
+  --border-mid: rgba(201,168,76,0.28);
+  --gold:       #f0b429;
+  --gold-light: #ffd166;
+  --gold-dim:   rgba(240,180,41,0.10);
+  --white:      #f0eade;
+  --white-dim:  rgba(240,234,222,0.60);
+  --white-faint:rgba(240,234,222,0.30);
+  --teal:       #1aab7a;
+  --teal-dim:   rgba(26,171,122,0.14);
+  --amber:      #e09a20;
+  --amber-dim:  rgba(224,154,32,0.14);
+  --red:        #c0392b;
+  --red-dim:    rgba(192,57,43,0.14);
+  --purple:     #8b5cf6;
+  --purple-dim: rgba(139,92,246,0.14);
+  --font-d:  'Cinzel', serif;
+  --font-b:  'Cormorant Garamond', serif;
+  --font-ui: 'DM Sans', sans-serif;
+}
+
+html, body {
+  background: var(--void);
+  color: var(--white);
+  font-family: var(--font-ui);
+  min-height: 100vh;
+}
+
+/* ── NAVBAR (matches screenshot exactly) ── */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--deep);
+  border-bottom: 2px solid var(--gold);
+  padding: 0 40px;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-ui);
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--gold);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+.nav-brand-icon { font-size: 1.3rem; }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-link {
+  font-size: 0.85rem;
+  font-weight: 400;
+  padding: 7px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--white-dim);
+  transition: color 0.2s, background 0.2s;
+  letter-spacing: 0.01em;
+}
+.nav-link:hover { color: var(--white); background: rgba(240,180,41,0.08); }
+.nav-link.active {
+  background: var(--gold);
+  color: #1a1200;
+  font-weight: 500;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.nav-bell {
+  font-size: 1.1rem;
+  color: var(--gold);
+  cursor: pointer;
+  position: relative;
+}
+.bell-dot {
+  position: absolute;
+  top: -3px; right: -3px;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #e74c3c;
+  border: 1px solid var(--deep);
+}
+.nav-user {
+  font-size: 0.82rem;
+  color: var(--white-dim);
+  letter-spacing: 0.02em;
+}
+
+/* ── PAGE ── */
+.page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 40px 80px;
+}
+
+/* ── BACK ── */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.8rem;
+  color: var(--white-faint);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  margin-bottom: 28px;
+  transition: color 0.2s;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+}
+.back-link:hover { color: var(--gold); }
+
+/* ── HEADER ROW ── */
+.detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  gap: 20px;
+  animation: fadeUp 0.5s ease both;
+}
+.detail-heading {
+  font-family: var(--font-d);
+  font-size: 1.55rem;
+  font-weight: 400;
+  letter-spacing: 0.07em;
+  color: var(--white);
+  margin-bottom: 5px;
+}
+.detail-id {
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  color: var(--white-faint);
+  text-transform: uppercase;
+}
+.header-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.status-badge {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 30px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.status-badge.confirmed { background: var(--teal-dim); color: #2ecc71; border: 1px solid rgba(26,171,122,0.25); }
+.status-badge.pending   { background: var(--amber-dim); color: #f0b429; border: 1px solid rgba(240,180,41,0.25); }
+.status-badge.completed { background: var(--purple-dim); color: #a78bfa; border: 1px solid rgba(139,92,246,0.25); }
+.status-badge.cancelled { background: var(--red-dim); color: #e74c3c; border: 1px solid rgba(192,57,43,0.25); }
+
+/* ── STATUS BANNER ── */
+.status-banner {
+  border-radius: 12px;
+  padding: 22px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  animation: fadeUp 0.5s 0.05s ease both;
+}
+.status-banner.confirmed { background: var(--teal-dim);   border: 1px solid rgba(26,171,122,0.2); }
+.status-banner.pending   { background: var(--amber-dim);  border: 1px solid rgba(240,180,41,0.2); }
+.status-banner.completed { background: var(--purple-dim); border: 1px solid rgba(139,92,246,0.2); }
+.status-banner.cancelled { background: var(--red-dim);    border: 1px solid rgba(192,57,43,0.2); }
+
+.banner-left { display: flex; align-items: center; gap: 16px; }
+.banner-icon { font-size: 1.8rem; }
+.banner-title {
+  font-family: var(--font-d);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  color: var(--white);
+  margin-bottom: 3px;
+}
+.banner-sub { font-size: 0.78rem; color: var(--white-faint); }
+.banner-countdown {
+  font-family: var(--font-d);
+  font-size: 1rem;
+  color: var(--gold);
+  letter-spacing: 0.05em;
+  text-align: right;
+}
+.banner-countdown small { font-family: var(--font-ui); font-size: 0.68rem; color: var(--white-faint); display: block; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 2px; }
+
+/* ── GRID LAYOUT ── */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ── CARD ── */
+.d-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  animation: fadeUp 0.5s ease both;
+}
+.d-card:nth-child(1) { animation-delay: 0.08s; }
+.d-card:nth-child(2) { animation-delay: 0.13s; }
+.d-card:nth-child(3) { animation-delay: 0.18s; }
+.d-card:nth-child(4) { animation-delay: 0.23s; }
+
+.d-card-head {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.d-card-title {
+  font-size: 0.68rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.d-card-title-icon { font-size: 0.9rem; opacity: 0.8; }
+.d-card-body { padding: 22px; }
+
+/* ── INFO GRID ── */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.info-item {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  transition: border-color 0.2s;
+}
+.info-item:hover { border-color: var(--border-mid); }
+.info-label {
+  font-size: 0.67rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--white-faint);
+  margin-bottom: 7px;
+}
+.info-value {
+  font-size: 0.9rem;
+  color: var(--white);
+  font-weight: 500;
+}
+.info-value.gold { color: var(--gold); }
+.info-value.type-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--white);
+}
+.type-icon { font-size: 0.9rem; }
+
+/* ── RAQI CARD ── */
+.raqi-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 4px 0 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.raqi-avatar {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--purple-dim);
+  border: 2px solid rgba(139,92,246,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-d);
+  font-size: 1.3rem;
+  color: #a78bfa;
+  flex-shrink: 0;
+}
+.raqi-name {
+  font-family: var(--font-d);
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  color: var(--white);
+  margin-bottom: 3px;
+}
+.raqi-spec { font-size: 0.75rem; color: var(--white-faint); margin-bottom: 5px; }
+.raqi-stars { font-size: 0.82rem; color: var(--gold); letter-spacing: 2px; }
+.raqi-sessions { font-size: 0.7rem; color: var(--white-faint); }
+
+/* ── PARTICIPANTS ── */
+.participant-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.participant-row:last-child { border-bottom: none; padding-bottom: 0; }
+.p-av {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-d);
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  border: 1px solid;
+}
+.p-av.lead    { background: var(--gold-dim); border-color: rgba(240,180,41,0.3); color: var(--gold); }
+.p-av.co_raqi { background: var(--purple-dim); border-color: rgba(139,92,246,0.3); color: #a78bfa; }
+.p-name { font-size: 0.83rem; color: var(--white-dim); flex: 1; }
+.p-badge {
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.p-badge.lead    { background: var(--gold-dim); color: var(--gold); }
+.p-badge.co_raqi { background: var(--purple-dim); color: #a78bfa; }
+
+/* ── SESSION NOTES ── */
+.note-item {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.note-item:last-child { border-bottom: none; }
+.note-type-tag {
+  display: inline-block;
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+  background: var(--gold-dim);
+  color: var(--gold);
+}
+.note-type-tag.observation    { background: var(--teal-dim); color: #2ecc71; }
+.note-type-tag.recommendation { background: var(--purple-dim); color: #a78bfa; }
+.note-text {
+  font-family: var(--font-b);
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--white-dim);
+  line-height: 1.75;
+  margin-bottom: 6px;
+}
+.note-author { font-size: 0.7rem; color: var(--white-faint); }
+
+/* ── PATIENT NOTES ── */
+.patient-note-box {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 16px 18px;
+}
+.patient-note-text {
+  font-family: var(--font-b);
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--white-dim);
+  line-height: 1.8;
+}
+
+/* ── SIDEBAR CARDS ── */
+.sidebar-col .d-card { margin-bottom: 20px; }
+
+/* ── ACTION BUTTONS ── */
+.action-list { display: flex; flex-direction: column; gap: 10px; }
+.btn {
+  width: 100%;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-primary {
+  background: var(--gold);
+  color: #1a1200;
+  border-color: var(--gold);
+  font-weight: 500;
+}
+.btn-primary:hover { background: var(--gold-light); border-color: var(--gold-light); transform: translateY(-1px); }
+.btn-ghost {
+  background: none;
+  color: var(--white-dim);
+  border-color: var(--border-mid);
+}
+.btn-ghost:hover { color: var(--white); border-color: var(--gold); background: var(--gold-dim); }
+.btn-danger {
+  background: none;
+  color: #e74c3c;
+  border-color: rgba(192,57,43,0.3);
+}
+.btn-danger:hover { background: var(--red-dim); border-color: var(--red); }
+
+/* ── FOLLOW-UP BOX ── */
+.followup-box {
+  background: var(--card2);
+  border: 1px solid rgba(26,171,122,0.25);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.followup-icon { font-size: 1.3rem; margin-top: 1px; }
+.followup-date {
+  font-family: var(--font-d);
+  font-size: 0.88rem;
+  color: #2ecc71;
+  margin-bottom: 3px;
+}
+.followup-note { font-size: 0.75rem; color: var(--white-faint); line-height: 1.6; }
+
+/* ── EMPTY NOTES ── */
+.empty-notes {
+  text-align: center;
+  padding: 24px 0 8px;
+  color: var(--white-faint);
+  font-size: 0.82rem;
+  font-style: italic;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 800px) {
+  .navbar { padding: 0 16px; }
+  .page { padding: 20px 16px 60px; }
+  .detail-grid { grid-template-columns: 1fr; }
+  .info-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a class="nav-brand" href="#">
+    <span class="nav-brand-icon">🌙</span>
+    Jetty Healing
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="#">Dashboard</a>
+    <a class="nav-link active" href="#">Appointments</a>
+    <a class="nav-link" href="#">Browse Raqis</a>
+    <a class="nav-link" href="#">Profile</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-bell">
+      🔔
+      <div class="bell-dot"></div>
+    </div>
+    <div class="nav-user">userfsdfds</div>
+  </div>
+</nav>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- BACK -->
+  <button class="back-link" onclick="history.back()">
+    ← My Appointments
+  </button>
+
+  <!-- HEADER -->
+  <div class="detail-header">
+    <div>
+      <h1 class="detail-heading">Appointment Details</h1>
+      <div class="detail-id">ID: #APPT-2026-0041 &nbsp;·&nbsp; Booked on 1 Apr 2026</div>
+    </div>
+    <div class="header-badge-row">
+      <span class="status-badge confirmed">Confirmed</span>
+    </div>
+  </div>
+
+  <!-- STATUS BANNER -->
+  <div class="status-banner confirmed">
+    <div class="banner-left">
+      <div class="banner-icon">✅</div>
+      <div>
+        <div class="banner-title">Your session is confirmed</div>
+        <div class="banner-sub">Wednesday, 9 April 2026 at 2:00 PM — Sheikh Abdullah is expecting you</div>
+      </div>
+    </div>
+    <div class="banner-countdown">
+      <small>Starts in</small>
+      8 days
+    </div>
+  </div>
+
+  <!-- TWO-COLUMN GRID -->
+  <div class="detail-grid">
+
+    <!-- LEFT COLUMN -->
+    <div class="main-col">
+
+      <!-- SESSION INFO -->
+      <div class="d-card">
+        <div class="d-card-head">
+          <div class="d-card-title"><span class="d-card-title-icon">📋</span> Appointment</div>
+        </div>
+        <div class="d-card-body">
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Type</div>
+              <div class="info-value type-pill">
+                <span class="type-icon">🎥</span> Online Video
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Date</div>
+              <div class="info-value">Wed, 9 Apr 2026</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Duration</div>
+              <div class="info-value gold">60 min</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Status</div>
+              <div class="info-value"><span class="status-badge confirmed" style="font-size:0.65rem;padding:4px 12px;">Confirmed</span></div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Time</div>
+              <div class="info-value">2:00 PM — 3:00 PM</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Session Room</div>
+              <div class="info-value gold" style="font-size:0.8rem;">jetty-appt-2026-0041</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RAQI -->
+      <div class="d-card">
+        <div class="d-card-head">
+          <div class="d-card-title"><span class="d-card-title-icon">🕌</span> Your Raqi</div>
+        </div>
+        <div class="d-card-body">
+          <div class="raqi-card">
+            <div class="raqi-avatar">A</div>
+            <div>
+              <div class="raqi-name">Sheikh Abdullah</div>
+              <div class="raqi-spec">Sihr · Jinn · Protection</div>
+              <div class="raqi-stars">★★★★★</div>
+            </div>
+            <div style="margin-left:auto;text-align:right;">
+              <div class="raqi-sessions">340 sessions</div>
+              <div style="font-size:0.7rem;color:var(--teal);margin-top:4px;">● Active</div>
+            </div>
+          </div>
+          <!-- Participants -->
+          <div style="font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">Session Participants</div>
+          <div class="participant-row">
+            <div class="p-av lead">A</div>
+            <div class="p-name">Sheikh Abdullah</div>
+            <span class="p-badge lead">Lead Raqi</span>
+          </div>
+          <div class="participant-row">
+            <div class="p-av co_raqi">Y</div>
+            <div class="p-name">Sheikh Yusuf</div>
+            <span class="p-badge co_raqi">Co-Raqi</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- YOUR NOTES -->
+      <div class="d-card">
+        <div class="d-card-head">
+          <div class="d-card-title"><span class="d-card-title-icon">📝</span> Your Submitted Notes</div>
+        </div>
+        <div class="d-card-body">
+          <div class="patient-note-box">
+            <div class="patient-note-text">
+              I have been experiencing severe headaches and nightmares for the past three months. Feeling spiritually heavy and unable to read Quran properly. There is also a recurring sensation of pressure on my chest during sleep.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SESSION NOTES -->
+      <div class="d-card">
+        <div class="d-card-head">
+          <div class="d-card-title"><span class="d-card-title-icon">🌿</span> Session Notes</div>
+          <span style="font-size:0.7rem;color:var(--white-faint);">Added by Raqi after session</span>
+        </div>
+        <div class="d-card-body">
+          <div class="empty-notes">Notes will appear here once the session is completed.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="sidebar-col">
+
+      <!-- ACTIONS -->
+      <div class="d-card">
+        <div class="d-card-head">
+          <div class="d-card-title"><span class="d-card-title-icon">⚡</span> Actions</div>
+        </div>
+        <div class="d-card-body">
+          <div class="action-list">
+            <button class="btn btn-primary" onclick="alert('Joining video session...')">
+              🎥 Join Session
+            </button>
+            <button class="btn btn-ghost" onclick="alert('Adding to calendar...')">
+              📅 Add to Calendar
+            </button>
+            <button class="btn btn-ghost" onclick="alert('Contacting support...')">
+              💬 Contact Support
+            </button>
+            <button class="btn btn-danger" onclick="confirmCancel()">
+              ✕ Cancel Appointment
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOLLOW-UP -->
+      <div class="d-card">
+        <div class="d-card-head">
+          <div class="d-card-title"><span class="d-card-title-icon">🔄</span> Follow-Up</div>
+        </div>
+        <div class="d-card-body">
+          <div class="followup-box">
+            <div class="followup-icon">📌</div>
+            <div>
+              <div class="followup-date">Wed, 23 Apr 2026</div>
+              <div class="followup-note">Follow-up session scheduled. Continue morning & evening adhkar until then.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUICK INFO -->
+      <div class="d-card">
+        <div class="d-card-head">
+          <div class="d-card-title"><span class="d-card-title-icon">ℹ️</span> Quick Info</div>
+        </div>
+        <div class="d-card-body" style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <div class="info-label" style="margin-bottom:4px;">Ailment Category</div>
+            <div style="font-size:0.85rem;color:var(--white);">Sihr (Black Magic)</div>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:12px;">
+            <div class="info-label" style="margin-bottom:4px;">Cancellation Policy</div>
+            <div style="font-size:0.78rem;color:var(--white-faint);line-height:1.7;">Free cancellation up to <span style="color:var(--white);">2 hours</span> before the session start time.</div>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:12px;">
+            <div class="info-label" style="margin-bottom:4px;">Need Help?</div>
+            <div style="font-size:0.78rem;color:var(--gold);cursor:pointer;">support@jettyhealing.com</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+function confirmCancel() {
+  if (confirm('Are you sure you want to cancel this appointment?\nCancellation is only allowed more than 2 hours before the session.')) {
+    alert('Appointment cancellation request submitted.');
+  }
+}
+
+// Demo: switch status
+function setStatus(s) {
+  const banners = document.querySelectorAll('.status-banner');
+  const badges  = document.querySelectorAll('.status-badge');
+  banners.forEach(b => { b.className = 'status-banner ' + s; });
+  badges.forEach(b  => { b.className = 'status-badge '  + s; b.textContent = s.charAt(0).toUpperCase() + s.slice(1); });
+  const icons = { confirmed: '✅', pending: '⏳', completed: '✦', cancelled: '✕' };
+  document.querySelector('.banner-icon').textContent = icons[s] || '✅';
+}
+</script>
+</body>
+</html>

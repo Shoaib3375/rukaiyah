@@ -11,7 +11,7 @@ class SessionNoteController extends ApiController
     public function index(Appointment $appointment): JsonResponse
     {
         $this->authorize('view', $appointment);
-        return $this->success($appointment->notes);
+        return $this->success($appointment->notes()->with('raqi.user')->latest()->get());
     }
 
     public function store(StoreRequest $request, Appointment $appointment): JsonResponse
@@ -22,6 +22,7 @@ class SessionNoteController extends ApiController
             'content' => $request->content,
             'note_type' => $request->note_type,
         ]);
+        $note->load('raqi.user');
         event(new \App\Events\SessionNoteAdded($note));
         return $this->success($note, 'Note added successfully.', 201);
     }

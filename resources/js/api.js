@@ -110,6 +110,9 @@ export const raqiAPI = {
     notifications: {
         list: () => api.get('/raqi/notifications'),
         markRead: (id) => api.put(`/raqi/notifications/${id}/read`)
+    },
+    raqis: {
+        list: () => api.get('/raqi/raqis')
     }
 };
 

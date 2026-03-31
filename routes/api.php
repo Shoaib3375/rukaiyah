@@ -63,6 +63,7 @@ Route::prefix('v1')->group(function () {
         Route::post('appointments/{appointment}/followup',        [FollowUpController::class, 'store']);
         Route::get ('notifications',                              [NotificationController::class, 'index']);
         Route::put ('notifications/{notification}/read',          [NotificationController::class, 'markRead']);
+        Route::get ('raqis',                                      [RaqiController::class, 'index']);
     });
 
     // Admin

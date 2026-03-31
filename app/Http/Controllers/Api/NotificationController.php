@@ -10,7 +10,7 @@ class NotificationController extends ApiController
     {
         $limit = min($request->query('limit', 20), 100);
         $notifications = auth('api')->user()->notifications()
-            ->select(['id', 'user_id', 'type', 'data', 'read_at', 'created_at'])
+            ->select(['id', 'user_id', 'appointment_id', 'title', 'body', 'channel', 'is_read', 'sent_at', 'created_at'])
             ->latest()
             ->paginate($limit);
         return $this->success($notifications);
