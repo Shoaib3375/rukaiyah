@@ -28,7 +28,7 @@
               Appointments
             </router-link>
             <router-link
-              to="/patient/raqis"
+              to="/raqis"
               class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
               :class="isActive('/patient/raqis') ? 'bg-yellow-600 bg-opacity-20 text-yellow-500 shadow-md' : 'text-gray-300 hover:text-gray-100 hover:bg-gray-800'"
             >

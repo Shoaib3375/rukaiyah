@@ -56,7 +56,9 @@ export const authAPI = {
 export const patientAPI = {
     profile: {
         get: () => api.get('/patient/profile'),
-        update: (data) => api.put('/patient/profile', data)
+        update: (data) => api.put('/patient/profile', data),
+        sessionLogs: () => api.get('/patient/session-logs'),
+        updatePassword: (data) => api.put('/patient/profile/password', data),
     },
     appointments: {
         list: () => api.get('/patient/appointments'),

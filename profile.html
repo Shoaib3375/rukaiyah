@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile — Jetty Healing</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --void:        #08060f;
+  --deep:        #0d0b1c;
+  --card:        #121024;
+  --card2:       #161330;
+  --card3:       #1b1840;
+  --border:      rgba(201,168,76,0.12);
+  --border-mid:  rgba(201,168,76,0.26);
+  --border-hi:   rgba(201,168,76,0.5);
+  --gold:        #f0b429;
+  --gold-light:  #ffd166;
+  --gold-dim:    rgba(240,180,41,0.09);
+  --white:       #f0eade;
+  --white-dim:   rgba(240,234,222,0.60);
+  --white-faint: rgba(240,234,222,0.28);
+  --teal:        #1aab7a;
+  --teal-dim:    rgba(26,171,122,0.12);
+  --red:         #c0392b;
+  --red-dim:     rgba(192,57,43,0.12);
+  --purple:      #8b5cf6;
+  --purple-dim:  rgba(139,92,246,0.12);
+  --amber-dim:   rgba(240,180,41,0.12);
+  --font-d:  'Cinzel', serif;
+  --font-b:  'Cormorant Garamond', serif;
+  --font-ui: 'DM Sans', sans-serif;
+}
+html, body { background: var(--void); color: var(--white); font-family: var(--font-ui); min-height: 100vh; }
+
+/* ── NAVBAR ── */
+.navbar { position: sticky; top: 0; z-index: 50; background: var(--deep); border-bottom: 2px solid var(--gold); padding: 0 40px; height: 62px; display: flex; align-items: center; justify-content: space-between; }
+.nav-brand { display: flex; align-items: center; gap: 9px; font-size: 1.1rem; font-weight: 500; color: var(--gold); text-decoration: none; }
+.nav-links { display: flex; align-items: center; gap: 4px; }
+.nav-link { font-size: 0.83rem; padding: 7px 16px; border-radius: 8px; text-decoration: none; color: var(--white-faint); border: none; background: none; cursor: pointer; transition: color .2s, background .2s; }
+.nav-link:hover { color: var(--white-dim); background: var(--gold-dim); }
+.nav-link.active { background: var(--gold); color: #1a1200; font-weight: 500; }
+.nav-right { display: flex; align-items: center; gap: 18px; }
+.nav-bell { font-size: 1.1rem; color: var(--gold); cursor: pointer; position: relative; }
+.bell-dot { position: absolute; top: -3px; right: -3px; width: 7px; height: 7px; border-radius: 50%; background: #e74c3c; border: 1px solid var(--deep); }
+.nav-user { font-size: 0.82rem; color: var(--white-dim); }
+
+/* ── PAGE ── */
+.page { max-width: 980px; margin: 0 auto; padding: 36px 40px 100px; }
+
+/* ── PROFILE HERO ── */
+.profile-hero {
+  display: flex; align-items: center; gap: 28px;
+  margin-bottom: 36px;
+  animation: fadeUp .5s ease both;
+}
+.hero-avatar-wrap { position: relative; flex-shrink: 0; }
+.hero-avatar {
+  width: 84px; height: 84px; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(139,92,246,.25), rgba(240,180,41,.18));
+  border: 2px solid var(--border-mid);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-d); font-size: 2rem; color: var(--gold);
+}
+.avatar-ring {
+  position: absolute; inset: -5px; border-radius: 50%;
+  border: 1px solid rgba(240,180,41,.2);
+  animation: ringPulse 3s ease-in-out infinite;
+}
+.avatar-edit {
+  position: absolute; bottom: 2px; right: 2px;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--gold); color: #1a1200;
+  border: 2px solid var(--void);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .65rem; cursor: pointer;
+  transition: background .2s, transform .2s;
+}
+.avatar-edit:hover { background: var(--gold-light); transform: scale(1.1); }
+.hero-info { flex: 1; }
+.hero-name { font-family: var(--font-d); font-size: 1.5rem; font-weight: 400; letter-spacing: .07em; color: var(--white); margin-bottom: 4px; }
+.hero-email { font-size: .82rem; color: var(--white-faint); margin-bottom: 10px; }
+.hero-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.hbadge { font-size: .65rem; letter-spacing: .16em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; }
+.hbadge.patient { background: var(--teal-dim); color: #2ecc71; border: 1px solid rgba(26,171,122,.25); }
+.hbadge.verified { background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(240,180,41,.25); }
+.hbadge.sessions { background: var(--purple-dim); color: #a78bfa; border: 1px solid rgba(139,92,246,.25); }
+.hero-save {
+  margin-left: auto; font-family: var(--font-ui); font-size: .78rem;
+  letter-spacing: .14em; text-transform: uppercase;
+  background: var(--gold); color: #1a1200;
+  border: none; padding: 11px 26px; border-radius: 8px;
+  cursor: pointer; font-weight: 500; transition: background .2s, transform .2s;
+  flex-shrink: 0;
+}
+.hero-save:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+/* ── TAB NAV ── */
+.tab-nav {
+  display: flex; gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+  animation: fadeUp .5s .05s ease both;
+}
+.tab-btn {
+  display: flex; align-items: center; gap: 8px;
+  font-size: .82rem; padding: 12px 22px;
+  color: var(--white-faint); background: none;
+  border: none; border-bottom: 2px solid transparent;
+  cursor: pointer; transition: color .2s, border-color .2s;
+  letter-spacing: .04em; margin-bottom: -1px;
+}
+.tab-btn:hover { color: var(--white-dim); }
+.tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+.tab-icon { font-size: .95rem; }
+.tab-badge { font-size: .6rem; background: var(--gold-dim); color: var(--gold); border-radius: 20px; padding: 1px 7px; }
+
+/* ── TAB PANELS ── */
+.tab-panel { display: none; animation: fadeUp .4s ease both; }
+.tab-panel.active { display: block; }
+
+/* ── SECTION HEADER ── */
+.sec-head { margin-bottom: 22px; }
+.sec-title { font-family: var(--font-d); font-size: 1.05rem; font-weight: 400; letter-spacing: .08em; color: var(--white); margin-bottom: 4px; }
+.sec-sub { font-size: .78rem; color: var(--white-faint); line-height: 1.6; }
+
+/* ── CARD ── */
+.pcard { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+.pcard-head { padding: 15px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.pcard-title { font-size: .67rem; letter-spacing: .26em; text-transform: uppercase; color: var(--gold); display: flex; align-items: center; gap: 8px; }
+.pcard-body { padding: 24px; }
+
+/* ── FORM GRID ── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-grid.cols-1 { grid-template-columns: 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 7px; }
+.form-group.span2 { grid-column: span 2; }
+.form-group.span3 { grid-column: span 3; }
+.flabel { font-size: .67rem; letter-spacing: .18em; text-transform: uppercase; color: var(--white-faint); }
+.flabel span { color: #e74c3c; margin-left: 2px; }
+.finput, .fselect, .ftextarea {
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 11px 14px;
+  font-family: var(--font-ui); font-size: .85rem;
+  color: var(--white); outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.finput::placeholder, .ftextarea::placeholder { color: var(--white-faint); }
+.finput:focus, .fselect:focus, .ftextarea:focus {
+  border-color: var(--border-mid); box-shadow: 0 0 0 3px rgba(240,180,41,.08);
+}
+.fselect { cursor: pointer; }
+.ftextarea { resize: vertical; min-height: 90px; font-family: var(--font-b); font-size: .95rem; line-height: 1.7; }
+.fhint { font-size: .68rem; color: var(--white-faint); line-height: 1.5; }
+
+/* ── RADIO GROUP ── */
+.radio-group { display: flex; gap: 10px; flex-wrap: wrap; }
+.radio-pill {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 16px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--card2);
+  cursor: pointer; transition: border-color .2s, background .2s;
+  font-size: .8rem; color: var(--white-dim);
+  user-select: none;
+}
+.radio-pill input[type=radio] { display: none; }
+.radio-pill.selected { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.radio-pill:hover:not(.selected) { border-color: var(--border-mid); }
+
+/* ── CHECKBOX GROUP ── */
+.check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.check-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--card2);
+  cursor: pointer; transition: border-color .2s, background .2s;
+  font-size: .82rem; color: var(--white-dim);
+  user-select: none;
+}
+.check-item input[type=checkbox] { display: none; }
+.check-box {
+  width: 16px; height: 16px; border-radius: 4px;
+  border: 1px solid var(--border-mid); background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: border-color .2s, background .2s;
+  font-size: .7rem; color: #1a1200;
+}
+.check-item.checked { border-color: var(--gold); background: var(--gold-dim); color: var(--white); }
+.check-item.checked .check-box { background: var(--gold); border-color: var(--gold); }
+
+/* ── INTENSITY SLIDER ── */
+.slider-wrap { display: flex; align-items: center; gap: 14px; }
+.fslider { flex: 1; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px; background: var(--card3); outline: none; }
+.fslider::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--gold); cursor: pointer; border: 2px solid var(--void); transition: transform .15s; }
+.fslider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.slider-val { font-family: var(--font-d); font-size: .9rem; color: var(--gold); min-width: 20px; text-align: center; }
+.slider-labels { display: flex; justify-content: space-between; margin-top: 4px; }
+.slider-labels span { font-size: .62rem; color: var(--white-faint); letter-spacing: .08em; }
+
+/* ── DIVIDER ── */
+.divider { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
+
+/* ── SESSION LOG ── */
+.log-filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.log-filter {
+  font-size: .72rem; letter-spacing: .1em; text-transform: uppercase;
+  padding: 6px 16px; border-radius: 20px;
+  border: 1px solid var(--border); background: none;
+  color: var(--white-faint); cursor: pointer;
+  transition: all .2s;
+}
+.log-filter:hover { border-color: var(--border-mid); color: var(--white-dim); }
+.log-filter.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+
+.log-timeline { position: relative; padding-left: 28px; }
+.log-timeline::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 1px; background: linear-gradient(to bottom, var(--gold), rgba(240,180,41,0) 90%); opacity: .25; }
+
+.log-entry { position: relative; margin-bottom: 22px; }
+.log-dot {
+  position: absolute; left: -24px; top: 14px;
+  width: 10px; height: 10px; border-radius: 50%;
+  border: 1px solid var(--gold); background: var(--void);
+  transition: background .2s;
+}
+.log-entry:hover .log-dot { background: var(--gold); }
+.log-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden;
+  transition: border-color .25s;
+}
+.log-card:hover { border-color: var(--border-mid); }
+.log-card-head {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.log-appt-info { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.log-raqi-av {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-d); font-size: .78rem;
+  flex-shrink: 0; border: 1px solid;
+}
+.log-raqi-name { font-family: var(--font-d); font-size: .82rem; letter-spacing: .05em; color: var(--white); }
+.log-date { font-size: .7rem; color: var(--white-faint); margin-top: 1px; }
+.log-type-pill { font-size: .62rem; letter-spacing: .12em; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+.log-type-pill.video    { background: var(--blue-dim, rgba(59,130,246,.12)); color: #60a5fa; }
+.log-type-pill.phone    { background: var(--teal-dim); color: #2ecc71; }
+.log-type-pill.in_person{ background: var(--amber-dim); color: var(--gold); }
+.log-type-pill.chat     { background: var(--purple-dim); color: #a78bfa; }
+
+.log-notes { padding: 14px 18px; display: flex; flex-direction: column; gap: 12px; }
+.log-note-item { padding: 10px 14px; background: var(--card2); border-radius: 8px; border-left: 2px solid; }
+.log-note-item.ruqyah_log    { border-left-color: var(--gold); }
+.log-note-item.observation   { border-left-color: var(--teal); }
+.log-note-item.recommendation{ border-left-color: var(--purple); }
+.log-note-tag { font-size: .62rem; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 5px; }
+.log-note-tag.ruqyah_log    { color: var(--gold); }
+.log-note-tag.observation   { color: #2ecc71; }
+.log-note-tag.recommendation{ color: #a78bfa; }
+.log-note-text { font-family: var(--font-b); font-size: .95rem; font-style: italic; color: var(--white-dim); line-height: 1.75; }
+.log-note-by { font-size: .68rem; color: var(--white-faint); margin-top: 4px; }
+
+.log-empty { text-align: center; padding: 48px 20px; color: var(--white-faint); font-size: .85rem; font-style: italic; }
+
+/* ── DANGER ZONE ── */
+.danger-zone { background: var(--red-dim); border: 1px solid rgba(192,57,43,.3); border-radius: 12px; padding: 22px 24px; }
+.dz-title { font-family: var(--font-d); font-size: .95rem; letter-spacing: .06em; color: #e74c3c; margin-bottom: 8px; }
+.dz-desc { font-size: .8rem; color: var(--white-faint); line-height: 1.7; margin-bottom: 16px; }
+.dz-btn { font-family: var(--font-ui); font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; padding: 10px 22px; border-radius: 8px; border: 1px solid rgba(192,57,43,.5); background: none; color: #e74c3c; cursor: pointer; transition: all .2s; }
+.dz-btn:hover { background: rgba(192,57,43,.15); border-color: var(--red); }
+
+/* ── SAVE ROW ── */
+.save-row { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border); }
+.btn-save { font-family: var(--font-ui); font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; padding: 11px 28px; border-radius: 8px; border: none; background: var(--gold); color: #1a1200; cursor: pointer; font-weight: 500; transition: background .2s, transform .2s; }
+.btn-save:hover { background: var(--gold-light); transform: translateY(-1px); }
+.btn-discard { font-family: var(--font-ui); font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; padding: 11px 22px; border-radius: 8px; border: 1px solid var(--border-mid); background: none; color: var(--white-faint); cursor: pointer; transition: all .2s; }
+.btn-discard:hover { color: var(--white-dim); border-color: var(--border-hi); }
+
+/* ── PROGRESS BAR ── */
+.progress-wrap { margin-bottom: 8px; }
+.progress-label { display: flex; justify-content: space-between; font-size: .68rem; color: var(--white-faint); margin-bottom: 6px; }
+.progress-bar { height: 4px; background: var(--card3); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width .5s ease; }
+
+/* ── TOAST ── */
+.toast { position: fixed; bottom: 28px; right: 28px; background: var(--card2); border: 1px solid var(--border-mid); border-left: 3px solid var(--gold); border-radius: 10px; padding: 14px 20px; font-size: .82rem; color: var(--white-dim); z-index: 999; transform: translateY(20px); opacity: 0; transition: all .3s ease; pointer-events: none; display: flex; align-items: center; gap: 10px; max-width: 320px; }
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+@keyframes ringPulse { 0%,100%{transform:scale(1);opacity:.3} 50%{transform:scale(1.08);opacity:.15} }
+
+@media(max-width:760px){
+  .navbar { padding: 0 16px; }
+  .nav-links { display: none; }
+  .page { padding: 20px 16px 80px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+  .form-group.span2, .form-group.span3 { grid-column: span 1; }
+  .profile-hero { flex-wrap: wrap; }
+  .check-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a class="nav-brand" href="#">🌙 Jetty Healing</a>
+  <div class="nav-links">
+    <a class="nav-link" href="#">Dashboard</a>
+    <a class="nav-link" href="#">Appointments</a>
+    <a class="nav-link" href="#">Browse Raqis</a>
+    <a class="nav-link active" href="#">Profile</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-bell">🔔<div class="bell-dot"></div></div>
+    <span class="nav-user">Ahmad Rahman</span>
+  </div>
+</nav>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- PROFILE HERO -->
+  <div class="profile-hero">
+    <div class="hero-avatar-wrap">
+      <div class="hero-avatar">A</div>
+      <div class="avatar-ring"></div>
+      <div class="avatar-edit" onclick="toast('Photo upload coming soon.','📷')">✎</div>
+    </div>
+    <div class="hero-info">
+      <div class="hero-name">Ahmad Rahman</div>
+      <div class="hero-email">ahmad.rahman@example.com</div>
+      <div class="hero-badges">
+        <span class="hbadge patient">Patient</span>
+        <span class="hbadge verified">✓ Verified</span>
+        <span class="hbadge sessions">4 Sessions</span>
+      </div>
+    </div>
+    <button class="hero-save" onclick="saveAll()">Save Changes</button>
+  </div>
+
+  <!-- PROFILE COMPLETION -->
+  <div class="pcard" style="margin-bottom:28px;animation:fadeUp .5s .04s ease both;">
+    <div class="pcard-body" style="padding:18px 22px;">
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Profile completion</span><span id="progressPct">68%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:68%"></div></div>
+      </div>
+      <div style="font-size:.72rem;color:var(--white-faint);margin-top:6px;">Complete your Ruqyah profile so Raqis can prepare the right treatment for you.</div>
+    </div>
+  </div>
+
+  <!-- TAB NAV -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('general', this)">
+      <span class="tab-icon">⚙</span> General Settings
+    </button>
+    <button class="tab-btn" onclick="switchTab('advanced', this)">
+      <span class="tab-icon">🕌</span> Advanced Ruqyah Settings
+    </button>
+    <button class="tab-btn" onclick="switchTab('log', this)">
+      <span class="tab-icon">📜</span> Session Log
+      <span class="tab-badge">4</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('security', this)">
+      <span class="tab-icon">🔒</span> Security
+    </button>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- TAB 1 — GENERAL SETTINGS                -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="tab-panel active" id="tab-general">
+
+    <!-- Personal Details -->
+    <div class="pcard">
+      <div class="pcard-head">
+        <div class="pcard-title">👤 Personal Details</div>
+      </div>
+      <div class="pcard-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="flabel">Full Name <span>*</span></label>
+            <input class="finput" type="text" value="Ahmad Rahman" placeholder="Your full name">
+          </div>
+          <div class="form-group">
+            <label class="flabel">Display Name</label>
+            <input class="finput" type="text" value="Ahmad" placeholder="How Raqis will see you">
+          </div>
+          <div class="form-group">
+            <label class="flabel">Email Address <span>*</span></label>
+            <input class="finput" type="email" value="ahmad.rahman@example.com">
+          </div>
+          <div class="form-group">
+            <label class="flabel">Phone Number</label>
+            <input class="finput" type="tel" value="+8801700000000" placeholder="+880...">
+          </div>
+          <div class="form-group">
+            <label class="flabel">Date of Birth</label>
+            <input class="finput" type="date" value="1992-04-15">
+          </div>
+          <div class="form-group">
+            <label class="flabel">Gender</label>
+            <select class="fselect">
+              <option>Male</option>
+              <option>Female</option>
+              <option>Prefer not to say</option>
+            </select>
+          </div>
+          <div class="form-group span2">
+            <label class="flabel">Address</label>
+            <input class="finput" type="text" value="Mirpur 10, Dhaka" placeholder="Your address">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact & Emergency -->
+    <div class="pcard">
+      <div class="pcard-head">
+        <div class="pcard-title">📞 Emergency Contact</div>
+      </div>
+      <div class="pcard-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="flabel">Contact Name</label>
+            <input class="finput" type="text" placeholder="e.g. Wife, Father" value="Fatima Rahman">
+          </div>
+          <div class="form-group">
+            <label class="flabel">Relationship</label>
+            <select class="fselect">
+              <option>Spouse</option>
+              <option>Parent</option>
+              <option>Sibling</option>
+              <option>Friend</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="flabel">Phone Number</label>
+            <input class="finput" type="tel" placeholder="+880..." value="+8801600000001">
+          </div>
+          <div class="form-group">
+            <label class="flabel">Email (optional)</label>
+            <input class="finput" type="email" placeholder="emergency@email.com">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preferences -->
+    <div class="pcard">
+      <div class="pcard-head">
+        <div class="pcard-title">🌐 Session Preferences</div>
+      </div>
+      <div class="pcard-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="flabel">Preferred Session Type</label>
+            <select class="fselect">
+              <option>Online Video</option>
+              <option>Phone Call</option>
+              <option>In Person</option>
+              <option>Online Chat</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="flabel">Preferred Language</label>
+            <select class="fselect">
+              <option>Bengali</option>
+              <option>Arabic</option>
+              <option>English</option>
+              <option>Urdu</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="flabel">Raqi Gender Preference</label>
+            <select class="fselect">
+              <option>No Preference</option>
+              <option>Male Raqi Only</option>
+              <option>Female Raqi Only</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="flabel">Timezone</label>
+            <select class="fselect">
+              <option>Asia/Dhaka (UTC+6)</option>
+              <option>Asia/Dubai (UTC+4)</option>
+              <option>Europe/London (UTC+0)</option>
+            </select>
+          </div>
+          <div class="form-group span2">
+            <label class="flabel">Notification Preferences</label>
+            <div class="check-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+              <label class="check-item checked" onclick="toggleCheck(this)">
+                <input type="checkbox" checked>
+                <div class="check-box">✓</div>
+                Email
+              </label>
+              <label class="check-item checked" onclick="toggleCheck(this)">
+                <input type="checkbox" checked>
+                <div class="check-box">✓</div>
+                SMS
+              </label>
+              <label class="check-item" onclick="toggleCheck(this)">
+                <input type="checkbox">
+                <div class="check-box"></div>
+                Push
+              </label>
+              <label class="check-item checked" onclick="toggleCheck(this)">
+                <input type="checkbox" checked>
+                <div class="check-box">✓</div>
+                Reminders
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="save-row">
+      <button class="btn-discard" onclick="toast('Changes discarded.','↩')">Discard</button>
+      <button class="btn-save" onclick="saveAll()">Save General Settings</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- TAB 2 — ADVANCED RUQYAH SETTINGS        -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-advanced">
+
+    <!-- Spiritual Status -->
+    <div class="pcard">
+      <div class="pcard-head">
+        <div class="pcard-title">🌙 Spiritual Status</div>
+        <span style="font-size:.7rem;color:var(--white-faint);">Used by Raqis to assess your condition</span>
+      </div>
+      <div class="pcard-body">
+        <div class="form-grid cols-1">
+
+          <div class="form-group">
+            <label class="flabel">Primary Ailment / Concern <span>*</span></label>
+            <select class="fselect">
+              <option>Black Magic (Sihr)</option>
+              <option>Evil Eye (Nazar)</option>
+              <option>Jinn Possession</option>
+              <option>Waswas (Obsessive Thoughts)</option>
+              <option>Marriage Blockage</option>
+              <option>Spiritual Protection</option>
+              <option>General Healing</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="flabel">Secondary Concerns (select all that apply)</label>
+            <div class="check-grid">
+              <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box"></div>Sleep disturbances / nightmares</label>
+              <label class="check-item checked" onclick="toggleCheck(this)"><input type="checkbox" checked><div class="check-box">✓</div>Chest tightness / heaviness</label>
+              <label class="check-item checked" onclick="toggleCheck(this)"><input type="checkbox" checked><div class="check-box">✓</div>Difficulty in prayer / Quran</label>
+              <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box"></div>Frequent headaches</label>
+              <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box"></div>Unexplained body pain</label>
+              <label class="check-item checked" onclick="toggleCheck(this)"><input type="checkbox" checked><div class="check-box">✓</div>Anxiety / mental fog</label>
+              <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box"></div>Relationship / marriage issues</label>
+              <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box"></div>Financial / career blockages</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="flabel">How long have you been experiencing this?</label>
+            <div class="radio-group">
+              <label class="radio-pill" onclick="selectRadio(this,'duration')"><input type="radio" name="duration">Less than 1 month</label>
+              <label class="radio-pill" onclick="selectRadio(this,'duration')"><input type="radio" name="duration">1–3 months</label>
+              <label class="radio-pill selected" onclick="selectRadio(this,'duration')"><input type="radio" name="duration" checked>3–6 months</label>
+              <label class="radio-pill" onclick="selectRadio(this,'duration')"><input type="radio" name="duration">6–12 months</label>
+              <label class="radio-pill" onclick="selectRadio(this,'duration')"><input type="radio" name="duration">More than 1 year</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="flabel">Symptom Intensity</label>
+            <div class="slider-wrap">
+              <span style="font-size:.72rem;color:var(--white-faint);">Mild</span>
+              <input class="fslider" type="range" min="1" max="10" value="7" oninput="document.getElementById('sval').textContent=this.value">
+              <span style="font-size:.72rem;color:var(--white-faint);">Severe</span>
+              <div class="slider-val" id="sval">7</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed Symptoms -->
+    <div class="pcard">
+      <div class="pcard-head">
+        <div class="pcard-title">📝 Detailed Description</div>
+      </div>
+      <div class="pcard-body">
+        <div class="form-grid cols-1">
+          <div class="form-group">
+            <label class="flabel">Describe your symptoms in detail <span>*</span></label>
+            <textarea class="ftextarea" rows="5" placeholder="Describe what you experience physically, emotionally and spiritually. When did it start? What makes it worse or better?">I have been experiencing severe headaches and recurring nightmares for the past three months. There is a constant sense of spiritual heaviness and I find it very difficult to concentrate during prayer. On some nights I feel unexplained pressure on my chest and wake up unable to move for a few seconds.</textarea>
+            <div class="fhint">This is shared with your assigned Raqi before the session. Be as specific as possible.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="flabel">When do symptoms intensify?</label>
+            <div class="check-grid">
+              <label class="check-item checked" onclick="toggleCheck(this)"><input type="checkbox" checked><div class="check-box">✓</div>During / after prayer</label>
+              <label class="check-item checked" onclick="toggleCheck(this)"><input type="checkbox" checked><div class="check-box">✓</div>At night / before sleep</label>
+              <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box"></div>In the morning</label>
+              <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box"></div>When reading Quran</label>
+              <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box"></div>In specific locations</label>
+              <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box"></div>Around certain people</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="flabel">Do you hear voices or see shapes?</label>
+            <div class="radio-group">
+              <label class="radio-pill" onclick="selectRadio(this,'voices')"><input type="radio" name="voices">Never</label>
+              <label class="radio-pill selected" onclick="selectRadio(this,'voices')"><input type="radio" name="voices" checked>Occasionally</label>
+              <label class="radio-pill" onclick="selectRadio(this,'voices')"><input type="radio" name="voices">Frequently</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Medical & Religious -->
+    <div class="pcard">
+      <div class="pcard-head">
+        <div class="pcard-title">🏥 Medical & Religious Background</div>
+      </div>
+      <div class="pcard-body">
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label class="flabel">Have you had a medical checkup?</label>
+            <div class="radio-group">
+              <label class="radio-pill selected" onclick="selectRadio(this,'medical')"><input type="radio" name="medical" checked>Yes — no issues found</label>
+              <label class="radio-pill" onclick="selectRadio(this,'medical')"><input type="radio" name="medical">Yes — condition found</label>
+              <label class="radio-pill" onclick="selectRadio(this,'medical')"><input type="radio" name="medical">Not yet</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="flabel">Have you had Ruqyah before?</label>
+            <div class="radio-group">
+              <label class="radio-pill selected" onclick="selectRadio(this,'prev')"><input type="radio" name="prev" checked>Yes</label>
+              <label class="radio-pill" onclick="selectRadio(this,'prev')"><input type="radio" name="prev">No</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="flabel">Current medications (if any)</label>
+            <input class="finput" type="text" placeholder="List any current medications...">
+          </div>
+
+          <div class="form-group">
+            <label class="flabel">Madhhab (Islamic school of thought)</label>
+            <select class="fselect">
+              <option>Hanafi</option>
+              <option>Shafi'i</option>
+              <option>Maliki</option>
+              <option>Hanbali</option>
+              <option>Prefer not to say</option>
+            </select>
+          </div>
+
+          <div class="form-group span2">
+            <label class="flabel">Previous Ruqyah experience / what was done</label>
+            <textarea class="ftextarea" rows="3" placeholder="Describe any previous Ruqyah sessions you have had and whether they helped..."></textarea>
+          </div>
+
+          <div class="form-group span2">
+            <label class="flabel">Additional notes for Raqi (private)</label>
+            <textarea class="ftextarea" rows="3" placeholder="Any other information you want the Raqi to know before the session..."></textarea>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Consent -->
+    <div class="pcard">
+      <div class="pcard-head">
+        <div class="pcard-title">✅ Consent & Acknowledgements</div>
+      </div>
+      <div class="pcard-body">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <label class="check-item checked" style="align-items:flex-start;padding:14px;" onclick="toggleCheck(this)">
+            <input type="checkbox" checked>
+            <div class="check-box" style="margin-top:2px;">✓</div>
+            <span style="line-height:1.6;font-size:.82rem;">I confirm that I am seeking Ruqyah Shariah based on the Quran and authentic Sunnah only. I do not consent to any practices outside of Islamic guidelines.</span>
+          </label>
+          <label class="check-item checked" style="align-items:flex-start;padding:14px;" onclick="toggleCheck(this)">
+            <input type="checkbox" checked>
+            <div class="check-box" style="margin-top:2px;">✓</div>
+            <span style="line-height:1.6;font-size:.82rem;">I understand that Ruqyah is a spiritual treatment and is not a substitute for professional medical advice.</span>
+          </label>
+          <label class="check-item" style="align-items:flex-start;padding:14px;" onclick="toggleCheck(this)">
+            <input type="checkbox">
+            <div class="check-box" style="margin-top:2px;"></div>
+            <span style="line-height:1.6;font-size:.82rem;">I consent for my session notes to be stored on Jetty's platform for continuity of care between sessions.</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="save-row">
+      <button class="btn-discard" onclick="toast('Changes discarded.','↩')">Discard</button>
+      <button class="btn-save" onclick="saveAll()">Save Ruqyah Profile</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- TAB 3 — SESSION LOG                     -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-log">
+
+    <div class="sec-head">
+      <div class="sec-title">Your Session History</div>
+      <div class="sec-sub">All Ruqyah notes and observations written by your Raqis are stored here for your reference.</div>
+    </div>
+
+    <div class="log-filters">
+      <button class="log-filter active" onclick="filterLog('all',this)">All Sessions</button>
+      <button class="log-filter" onclick="filterLog('completed',this)">Completed</button>
+      <button class="log-filter" onclick="filterLog('ruqyah_log',this)">Ruqyah Logs</button>
+      <button class="log-filter" onclick="filterLog('recommendation',this)">Recommendations</button>
+    </div>
+
+    <div class="log-timeline" id="logTimeline">
+
+      <!-- Entry 1 -->
+      <div class="log-entry" data-status="completed">
+        <div class="log-dot"></div>
+        <div class="log-card">
+          <div class="log-card-head">
+            <div class="log-appt-info">
+              <div class="log-raqi-av" style="background:rgba(124,92,191,.15);border-color:rgba(124,92,191,.3);color:#a78bfa;">A</div>
+              <div>
+                <div class="log-raqi-name">Sheikh Abdullah</div>
+                <div class="log-date">Tue, 11 Mar 2026 · 11:00 AM</div>
+              </div>
+            </div>
+            <span class="log-type-pill video">Online Video</span>
+          </div>
+          <div class="log-notes">
+            <div class="log-note-item ruqyah_log">
+              <div class="log-note-tag ruqyah_log">Ruqyah Log</div>
+              <div class="log-note-text">Recited Surah Al-Baqarah in full with pauses for patient breathing. Strong physical reaction at verse 102. Continued with Al-Falaq and An-Nas three times each. Patient reported immediate relief in chest area.</div>
+              <div class="log-note-by">— Sheikh Abdullah · 11 Mar 2026, 12:04 PM</div>
+            </div>
+            <div class="log-note-item recommendation">
+              <div class="log-note-tag recommendation">Recommendation</div>
+              <div class="log-note-text">Recite Ayat al-Kursi after every salah for 40 days. Avoid eating food prepared outside the home until next session. Apply olive oil on the chest before sleeping while reciting Al-Mu'awwidhatayn.</div>
+              <div class="log-note-by">— Sheikh Abdullah · 11 Mar 2026, 12:08 PM</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Entry 2 -->
+      <div class="log-entry" data-status="completed">
+        <div class="log-dot"></div>
+        <div class="log-card">
+          <div class="log-card-head">
+            <div class="log-appt-info">
+              <div class="log-raqi-av" style="background:rgba(41,128,185,.15);border-color:rgba(41,128,185,.3);color:#5dade2;">Y</div>
+              <div>
+                <div class="log-raqi-name">Sheikh Yusuf</div>
+                <div class="log-date">Mon, 24 Mar 2026 · 4:00 PM</div>
+              </div>
+            </div>
+            <span class="log-type-pill in_person">In Person</span>
+          </div>
+          <div class="log-notes">
+            <div class="log-note-item ruqyah_log">
+              <div class="log-note-tag ruqyah_log">Ruqyah Log</div>
+              <div class="log-note-text">Focused session on waswas and mental blockage. Recited Surah Al-Baqarah verses 255–257, followed by Surah Al-Ikhlas 100 times. Patient became visibly calmer after the first 20 minutes.</div>
+              <div class="log-note-by">— Sheikh Yusuf · 24 Mar 2026, 5:05 PM</div>
+            </div>
+            <div class="log-note-item observation">
+              <div class="log-note-tag observation">Observation</div>
+              <div class="log-note-text">Symptoms appear consistent with persistent waswas affecting daily worship and concentration. Reactions suggest spiritual sensitivity rather than full possession. Progress since last session is notable.</div>
+              <div class="log-note-by">— Sheikh Yusuf · 24 Mar 2026, 5:10 PM</div>
+            </div>
+            <div class="log-note-item recommendation">
+              <div class="log-note-tag recommendation">Recommendation</div>
+              <div class="log-note-text">Continue morning and evening adhkar (Hisnul Muslim). Limit screen time after Isha. Read the last two verses of Surah Al-Baqarah before sleeping. Book follow-up in 2–3 weeks.</div>
+              <div class="log-note-by">— Sheikh Yusuf · 24 Mar 2026, 5:12 PM</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Entry 3 (older) -->
+      <div class="log-entry" data-status="completed">
+        <div class="log-dot"></div>
+        <div class="log-card">
+          <div class="log-card-head">
+            <div class="log-appt-info">
+              <div class="log-raqi-av" style="background:rgba(124,92,191,.15);border-color:rgba(124,92,191,.3);color:#a78bfa;">A</div>
+              <div>
+                <div class="log-raqi-name">Sheikh Abdullah <span style="font-size:.65rem;color:var(--white-faint);">+ Sheikh Musa (Co-Raqi)</span></div>
+                <div class="log-date">Sat, 1 Feb 2026 · 2:00 PM</div>
+              </div>
+            </div>
+            <span class="log-type-pill video">Online Video</span>
+          </div>
+          <div class="log-notes">
+            <div class="log-note-item ruqyah_log">
+              <div class="log-note-tag ruqyah_log">Ruqyah Log</div>
+              <div class="log-note-text">Initial assessment session. Full Al-Baqarah recitation. Patient showed significant reaction at multiple verses. Sihr-related symptoms strongly indicated. Two Raqis present for collaborative assessment.</div>
+              <div class="log-note-by">— Sheikh Abdullah · 1 Feb 2026, 3:20 PM</div>
+            </div>
+            <div class="log-note-item observation">
+              <div class="log-note-tag observation">Observation</div>
+              <div class="log-note-text">Reactions consistent with bound sihr (sihr marbout). Suspect long-standing case based on symptom history. Co-Raqi Sheikh Musa agrees. Will require multiple sessions.</div>
+              <div class="log-note-by">— Sheikh Musa (Co-Raqi) · 1 Feb 2026, 3:22 PM</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- TAB 4 — SECURITY                        -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-security">
+
+    <div class="pcard">
+      <div class="pcard-head"><div class="pcard-title">🔑 Change Password</div></div>
+      <div class="pcard-body">
+        <div class="form-grid cols-1" style="max-width:480px;">
+          <div class="form-group">
+            <label class="flabel">Current Password</label>
+            <input class="finput" type="password" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label class="flabel">New Password</label>
+            <input class="finput" type="password" placeholder="Min 8 characters">
+          </div>
+          <div class="form-group">
+            <label class="flabel">Confirm New Password</label>
+            <input class="finput" type="password" placeholder="Repeat new password">
+          </div>
+        </div>
+        <div class="save-row" style="max-width:480px;">
+          <button class="btn-save" onclick="toast('Password updated successfully.','🔑')">Update Password</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pcard">
+      <div class="pcard-head"><div class="pcard-title">📱 Two-Factor Authentication</div></div>
+      <div class="pcard-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:.88rem;color:var(--white);margin-bottom:4px;">SMS Authentication</div>
+            <div style="font-size:.75rem;color:var(--white-faint);">Receive a code on +8801700000000 when signing in</div>
+          </div>
+          <button class="btn-save" onclick="toast('2FA enabled!','📱')">Enable 2FA</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pcard">
+      <div class="pcard-head"><div class="pcard-title">🖥 Active Sessions</div></div>
+      <div class="pcard-body">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--card2);border:1px solid var(--border);border-radius:8px;">
+            <div>
+              <div style="font-size:.82rem;color:var(--white);">Chrome · Windows 11 <span style="background:var(--teal-dim);color:#2ecc71;font-size:.6rem;padding:2px 8px;border-radius:10px;margin-left:6px;">Current</span></div>
+              <div style="font-size:.7rem;color:var(--white-faint);margin-top:2px;">Dhaka, Bangladesh · Last active now</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--card2);border:1px solid var(--border);border-radius:8px;">
+            <div>
+              <div style="font-size:.82rem;color:var(--white);">Mobile · Android</div>
+              <div style="font-size:.7rem;color:var(--white-faint);margin-top:2px;">Dhaka, Bangladesh · Last active 2 days ago</div>
+            </div>
+            <button style="font-size:.7rem;color:#e74c3c;background:none;border:1px solid rgba(192,57,43,.3);padding:5px 12px;border-radius:6px;cursor:pointer;" onclick="toast('Session revoked.','✕')">Revoke</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="danger-zone">
+      <div class="dz-title">⚠ Danger Zone</div>
+      <div class="dz-desc">Permanently delete your account and all associated data including session logs, profile information and appointment history. This action cannot be undone.</div>
+      <button class="dz-btn" onclick="toast('Please contact support to delete your account.','⚠')">Delete My Account</button>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span id="toastIcon">✓</span>
+  <span id="toastMsg">Saved.</span>
+</div>
+
+<script>
+/* ── TABS ── */
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── RADIO ── */
+function selectRadio(pill, group) {
+  document.querySelectorAll(`input[name="${group}"]`).forEach(r => {
+    r.closest('.radio-pill').classList.remove('selected');
+  });
+  pill.classList.add('selected');
+}
+
+/* ── CHECKBOX ── */
+function toggleCheck(item) {
+  item.classList.toggle('checked');
+  const box = item.querySelector('.check-box');
+  box.textContent = item.classList.contains('checked') ? '✓' : '';
+  updateProgress();
+}
+
+/* ── PROGRESS ── */
+function updateProgress() {
+  const total   = document.querySelectorAll('.check-item').length;
+  const checked = document.querySelectorAll('.check-item.checked').length;
+  const pct = Math.round(50 + (checked / total) * 50);
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+/* ── LOG FILTER ── */
+function filterLog(type, btn) {
+  document.querySelectorAll('.log-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const entries = document.querySelectorAll('.log-entry');
+  if (type === 'all') { entries.forEach(e => e.style.display = ''); return; }
+  if (type === 'completed') { entries.forEach(e => e.style.display = ''); return; }
+  // filter by note type
+  document.querySelectorAll('.log-entry').forEach(entry => {
+    const has = entry.querySelector(`.log-note-item.${type}`);
+    entry.style.display = has ? '' : 'none';
+  });
+}
+
+/* ── SAVE ── */
+function saveAll() { toast('Profile saved successfully!', '✓'); }
+
+/* ── TOAST ── */
+let tt;
+function toast(msg, icon = '✓') {
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastIcon').textContent = icon;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(tt);
+  tt = setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>

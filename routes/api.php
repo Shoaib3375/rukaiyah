@@ -40,6 +40,8 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:api', 'role:patient'])->prefix('patient')->group(function () {
         Route::get ('profile',                           [PatientProfileController::class, 'show']);
         Route::put ('profile',                           [PatientProfileController::class, 'update']);
+        Route::put ('profile/password',                  [PatientProfileController::class, 'updatePassword']);
+        Route::get ('session-logs',                      [PatientProfileController::class, 'sessionLogs']);
         Route::get ('appointments',                      [AppointmentController::class, 'patientIndex']);
         Route::post('appointments',                      [AppointmentController::class, 'store']);
         Route::get ('appointments/{appointment}',        [AppointmentController::class, 'show']);
@@ -50,10 +52,14 @@ Route::prefix('v1')->group(function () {
         Route::put ('notifications/{notification}/read', [NotificationController::class, 'markRead']);
     });
 
-    // Raqi
+    // Raqi — profile while pending (complete onboarding until admin approves)
+    Route::middleware(['auth:api', 'role:raqi'])->prefix('raqi')->group(function () {
+        Route::get('profile', [RaqiProfileController::class, 'show']);
+        Route::put('profile', [RaqiProfileController::class, 'update']);
+    });
+
+    // Raqi — operational routes require approval
     Route::middleware(['auth:api', 'role:raqi', 'raqi.approved'])->prefix('raqi')->group(function () {
-        Route::get('profile',  [RaqiProfileController::class, 'show']);
-        Route::put('profile',  [RaqiProfileController::class, 'update']);
         Route::apiResource('availability', AvailabilityController::class);
         Route::get ('appointments',                               [AppointmentController::class, 'raqiIndex']);
         Route::get ('appointments/{appointment}',                 [AppointmentController::class, 'show']);

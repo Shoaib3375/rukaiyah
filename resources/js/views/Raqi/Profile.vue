@@ -6,6 +6,9 @@
       <p class="page-sub">Update your public Raqi profile</p>
 
       <div class="card-gold">
+        <div v-if="profile.is_approved === false" class="alert-error mb-4">
+          Your Raqi account is pending admin approval. You can edit your profile here; appointments, availability, and sessions are available after approval.
+        </div>
         <div v-if="message" :class="message.type === 'success' ? 'alert-success' : 'alert-error'" class="mb-4">{{ message.text }}</div>
         <form @submit.prevent="handleSave" class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
@@ -31,7 +34,15 @@ import { raqiAPI } from '../../api';
 
 const loading = ref(false);
 const message = ref(null);
-const profile = reactive({ full_name: '', email: '', phone: '', specialization: '', bio: '' });
+const profile = reactive({
+  full_name: '',
+  email: '',
+  phone: '',
+  specialization: '',
+  bio: '',
+  languages: null,
+  is_approved: null,
+});
 
 onMounted(async () => {
   try { const r = await raqiAPI.profile.get(); Object.assign(profile, r.data.data); }
