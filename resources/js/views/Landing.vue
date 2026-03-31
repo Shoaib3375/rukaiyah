@@ -48,7 +48,7 @@
         </p>
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style="animation-delay:0.2s">
-          <router-link to="/register" class="btn-gold-lg">
+          <router-link to="/raqis" class="btn-gold-lg">
             Find a Raqi
           </router-link>
           <router-link to="/register?role=raqi" class="btn-ghost-lg">

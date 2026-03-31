@@ -20,6 +20,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
 
+    // Public Raqi Browse Routes
+    Route::get('raqis', [RaqiController::class, 'index']);
+    Route::get('raqis/{raqi}', [RaqiController::class, 'show']);
+    Route::get('raqis/{raqi}/available-slots', [RaqiController::class, 'availableSlots']);
+
     // Auth
     Route::prefix('auth')->group(function () {
         Route::post('register', [AuthController::class, 'register']);
@@ -39,9 +44,7 @@ Route::prefix('v1')->group(function () {
         Route::post('appointments',                      [AppointmentController::class, 'store']);
         Route::get ('appointments/{appointment}',        [AppointmentController::class, 'show']);
         Route::delete('appointments/{appointment}',      [AppointmentController::class, 'cancel']);
-        Route::get ('raqis',                             [RaqiController::class, 'index']);
-        Route::get ('raqis/{raqi}',                      [RaqiController::class, 'show']);
-        Route::get ('raqis/{raqi}/available-slots',      [RaqiController::class, 'availableSlots']);
+
         Route::post('reviews',                           [ReviewController::class, 'store']);
         Route::get ('notifications',                     [NotificationController::class, 'index']);
         Route::put ('notifications/{notification}/read', [NotificationController::class, 'markRead']);

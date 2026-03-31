@@ -39,6 +39,10 @@ const routes = [
   { path: '/register', name: 'register', component: Register, meta: { requiresGuest: true } },
   { path: '/invites/:token', name: 'invite', component: InviteAccept, meta: { requiresAuth: true } },
 
+  // Public Raqi Browse Routes
+  { path: '/raqis', name: 'browse-raqis', component: PatientBrowseRaqis, meta: { requiresAuth: false } },
+  { path: '/raqis/:id', name: 'raqi-detail', component: PatientRaqiDetail, meta: { requiresAuth: false } },
+
   // Patient routes
   {
     path: '/patient',
@@ -49,8 +53,7 @@ const routes = [
       { path: 'appointments', name: 'patient-appointments', component: PatientAppointments },
       { path: 'appointments/:id', name: 'patient-appointment-detail', component: PatientAppointmentDetail },
       { path: 'appointments/book', name: 'patient-book-appointment', component: PatientBookAppointment },
-      { path: 'raqis', name: 'patient-browse-raqis', component: PatientBrowseRaqis },
-      { path: 'raqis/:id', name: 'patient-raqi-detail', component: PatientRaqiDetail },
+
       { path: 'notifications', name: 'patient-notifications', component: PatientNotifications }
     ]
   },
@@ -103,7 +106,9 @@ router.beforeEach(async (to, from, next) => {
   if (requiresGuest && isAuthenticated.value) {
     next({ name: userRole.value === 'patient' ? 'patient-dashboard' : userRole.value === 'raqi' ? 'raqi-dashboard' : 'admin-dashboard' });
   } else if (requiresAuth && !isAuthenticated.value) {
-    next({ name: 'login', query: { redirect: to.fullPath } });
+    let q = { redirect: to.fullPath };
+    if (to.name === 'patient-book-appointment') q.message = 'login_to_book';
+    next({ name: 'login', query: q });
   } else if (requiredRole && userRole.value !== requiredRole) {
     next({ name: 'login' });
   } else {

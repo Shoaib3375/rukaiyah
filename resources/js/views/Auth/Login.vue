@@ -71,6 +71,10 @@ const error = ref('');
 
 const form = reactive({ email: '', password: '' });
 
+if (route.query.message === 'login_to_book') {
+  error.value = 'To book an appointment, please login or register.';
+}
+
 const starStyle = (i) => ({
   left: `${(i * 137.508) % 100}%`,
   top: `${(i * 97.3) % 100}%`,

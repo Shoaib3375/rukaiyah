@@ -35,7 +35,7 @@ api.interceptors.response.use(
                 return api(originalRequest);
             } catch (refreshError) {
                 localStorage.removeItem('token');
-                window.location.href = '/login';
+                window.location.href = '/';
                 return Promise.reject(refreshError);
             }
         }
@@ -65,9 +65,9 @@ export const patientAPI = {
         cancel: (id) => api.delete(`/patient/appointments/${id}`)
     },
     raqis: {
-        list: () => api.get('/patient/raqis'),
-        get: (id) => api.get(`/patient/raqis/${id}`),
-        getAvailableSlots: (id, params) => api.get(`/patient/raqis/${id}/available-slots`, { params })
+        list: () => api.get('/raqis'),
+        get: (id) => api.get(`/raqis/${id}`),
+        getAvailableSlots: (id, params) => api.get(`/raqis/${id}/available-slots`, { params })
     },
     reviews: {
         create: (data) => api.post('/patient/reviews', data)

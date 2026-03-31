@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="page-inner">
-      <p class="eyebrow">Patient</p>
+      <p class="eyebrow">Directory</p>
       <h1 class="page-title">Browse Raqis</h1>
       <p class="page-sub">Find a certified Raqi for your healing journey</p>
 
@@ -14,7 +14,7 @@
       </div>
 
       <div v-else-if="filteredRaqis.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <router-link v-for="raqi in filteredRaqis" :key="raqi.id" :to="`/patient/raqis/${raqi.id}`" class="card raqi-card">
+        <router-link v-for="raqi in filteredRaqis" :key="raqi.id" :to="`/raqis/${raqi.id}`" class="card raqi-card">
           <div class="flex items-start justify-between mb-3">
             <div class="w-10 h-10 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center text-gold font-semibold text-sm">
               {{ raqi.user.full_name[0] }}
