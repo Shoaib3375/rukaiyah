@@ -25,13 +25,17 @@
           <p class="text-xs text-gold/60 mb-3">{{ raqi.specialization }}</p>
           <p v-if="raqi.bio" class="text-xs text-cream/35 leading-relaxed line-clamp-2 mb-3">{{ raqi.bio }}</p>
           <div class="flex items-center justify-between mt-auto pt-3 border-t border-white/5">
-            <div v-if="raqi.rating" class="flex items-center gap-1">
-              <span class="text-gold text-xs">★</span>
-              <span class="text-xs text-cream/60">{{ raqi.rating }}</span>
-              <span class="text-xs text-cream/25">({{ raqi.total_reviews }})</span>
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-0.5 text-gold text-xs leading-none" :title="ratingSummary(raqi)">
+                <span v-for="i in 5" :key="i">{{ i <= Math.round(Number(raqi.rating) || 0) ? '★' : '☆' }}</span>
+              </div>
+              <div v-if="Number(raqi.total_reviews) > 0" class="text-xs text-cream/50">
+                <span class="text-cream/70 font-medium">{{ Number(raqi.rating).toFixed(1) }}</span>
+                <span class="text-cream/25"> · {{ raqi.total_reviews }} review{{ Number(raqi.total_reviews) === 1 ? '' : 's' }}</span>
+              </div>
+              <span v-else class="text-xs text-cream/25">No reviews yet</span>
             </div>
-            <span v-else class="text-xs text-cream/25">No reviews yet</span>
-            <span class="text-xs text-gold/50">View →</span>
+            <span class="text-xs text-gold/50 shrink-0">View →</span>
           </div>
         </router-link>
       </div>
@@ -56,6 +60,12 @@ const filteredRaqis = computed(() =>
     r.specialization?.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 );
+
+function ratingSummary(raqi) {
+  const n = Number(raqi.total_reviews) || 0;
+  if (!n) return 'No reviews yet';
+  return `${Number(raqi.rating).toFixed(1)} average from ${n} review${n === 1 ? '' : 's'}`;
+}
 
 onMounted(async () => {
   try { const r = await patientAPI.raqis.list(); raqis.value = unwrap(r); }

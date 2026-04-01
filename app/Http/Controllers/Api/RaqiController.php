@@ -36,7 +36,13 @@ class RaqiController extends ApiController
             return $this->error('Raqi not found or not active.', 404);
         }
 
-        return $this->success($raqi->load(['user', 'availabilities', 'reviews.patient']));
+        $raqi->load(['user', 'availabilities']);
+        $raqi->setRelation(
+            'reviews',
+            $raqi->reviews()->with('patient:id,full_name')->latest()->limit(50)->get()
+        );
+
+        return $this->success($raqi);
     }
 
     public function availableSlots(Request $request, RaqiProfile $raqi): JsonResponse

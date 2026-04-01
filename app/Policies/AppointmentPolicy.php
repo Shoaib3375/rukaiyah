@@ -37,4 +37,20 @@ class AppointmentPolicy
     {
         return $user->raqiProfile?->id === $appointment->lead_raqi_id;
     }
+
+    /**
+     * Patient may leave one review after the session is completed.
+     */
+    public function createReview(User $user, Appointment $appointment): bool
+    {
+        if ($user->id !== $appointment->patient_id) {
+            return false;
+        }
+
+        if ($appointment->status !== AppointmentStatus::Completed) {
+            return false;
+        }
+
+        return ! $appointment->review()->exists();
+    }
 }

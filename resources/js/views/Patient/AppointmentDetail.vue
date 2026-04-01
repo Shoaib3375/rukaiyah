@@ -91,7 +91,7 @@
                     <div class="raqi-spec">{{ appointment.lead_raqi?.specialization || 'General Healing' }}</div>
                     <div class="raqi-stars">
                       <template v-for="i in 5" :key="i">
-                        {{ i <= Math.round(appointment.lead_raqi?.rating || 0) ? '★' : '☆' }}
+                        {{ i <= Math.round(Number(appointment.lead_raqi?.rating) || 0) ? '★' : '☆' }}
                       </template>
                     </div>
                   </div>
@@ -169,6 +169,43 @@
                   </div>
                 </div>
                 <div v-else class="empty-notes">Notes will appear here once the session is completed and the Raqi adds them.</div>
+              </div>
+            </div>
+
+            <!-- RATE RAQI (after completed session) -->
+            <div v-if="appointment.status === 'completed'" class="d-card">
+              <div class="d-card-head">
+                <div class="d-card-title"><span class="d-card-title-icon">⭐</span> Rate your Raqi</div>
+              </div>
+              <div class="d-card-body">
+                <template v-if="appointment.review">
+                  <p class="info-label" style="margin-bottom:10px;">Your review</p>
+                  <div class="review-stars-display">
+                    <span v-for="i in 5" :key="i">{{ i <= (appointment.review.rating || 0) ? '★' : '☆' }}</span>
+                  </div>
+                  <p v-if="appointment.review.comment" class="review-comment-text">{{ appointment.review.comment }}</p>
+                  <p v-else class="empty-notes" style="padding:12px 0 0;">Thank you for your rating.</p>
+                </template>
+                <form v-else class="review-form" @submit.prevent="submitReview">
+                  <p class="review-intro">How was your session? Your star rating and comment appear on this Raqi’s public profile to help other patients.</p>
+                  <div class="star-pick" role="group" aria-label="Rating 1 to 5 stars">
+                    <button
+                      v-for="n in 5"
+                      :key="n"
+                      type="button"
+                      class="star-btn"
+                      :class="{ active: reviewRating >= n }"
+                      :aria-pressed="reviewRating >= n"
+                      @click="reviewRating = n"
+                    >{{ reviewRating >= n ? '★' : '☆' }}</button>
+                  </div>
+                  <label class="info-label review-label">Comment <span style="opacity:0.5;font-weight:400;">(optional)</span></label>
+                  <textarea v-model="reviewComment" class="review-textarea" rows="4" placeholder="What went well? What might help others?" maxlength="5000"></textarea>
+                  <p v-if="reviewError" class="review-err">{{ reviewError }}</p>
+                  <button type="submit" class="btn btn-primary review-submit" :disabled="reviewSubmitting || reviewRating < 1">
+                    {{ reviewSubmitting ? 'Submitting…' : 'Submit review' }}
+                  </button>
+                </form>
               </div>
             </div>
 
@@ -260,14 +297,18 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { patientAPI } from '../../api';
 import { formatDateTime, formatDate, formatTime, unwrap } from '../../utils';
 
 const route = useRoute();
-const router = useRouter();
 const appointment = ref(null);
 const loading = ref(true);
+
+const reviewRating = ref(0);
+const reviewComment = ref('');
+const reviewSubmitting = ref(false);
+const reviewError = ref('');
 
 onMounted(async () => {
   try {
@@ -372,6 +413,27 @@ const addToCalendar = () => {
 
 const contactSupport = () => {
   alert('Contacting support...');
+};
+
+const submitReview = async () => {
+  if (!appointment.value || reviewRating.value < 1) return;
+  reviewError.value = '';
+  reviewSubmitting.value = true;
+  try {
+    await patientAPI.reviews.create({
+      appointment_id: appointment.value.id,
+      rating: reviewRating.value,
+      comment: reviewComment.value.trim() || undefined,
+    });
+    const res = await patientAPI.appointments.get(route.params.id);
+    appointment.value = unwrap(res);
+    reviewRating.value = 0;
+    reviewComment.value = '';
+  } catch (e) {
+    reviewError.value = e.response?.data?.message || 'Could not submit review.';
+  } finally {
+    reviewSubmitting.value = false;
+  }
 };
 </script>
 
@@ -652,6 +714,62 @@ const contactSupport = () => {
   margin-bottom: 6px;
 }
 .note-author { font-size: 0.7rem; color: rgba(240,234,222,0.3); }
+
+.review-stars-display {
+  font-size: 1.1rem;
+  color: #f0b429;
+  letter-spacing: 4px;
+  margin-bottom: 12px;
+}
+.review-comment-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: rgba(240,234,222,0.65);
+}
+.review-intro {
+  font-size: 0.78rem;
+  color: rgba(240,234,222,0.4);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.star-pick {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.star-btn {
+  background: none;
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 8px;
+  font-size: 1.35rem;
+  color: rgba(240,180,41,0.35);
+  cursor: pointer;
+  padding: 4px 10px;
+  line-height: 1;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.star-btn:hover, .star-btn.active {
+  color: #f0b429;
+  border-color: rgba(240,180,41,0.45);
+  background: rgba(240,180,41,0.08);
+}
+.review-label { margin-top: 18px; margin-bottom: 8px; display: block; }
+.review-textarea {
+  width: 100%;
+  background: #181535;
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: #f0eade;
+  font-size: 0.88rem;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+}
+.review-textarea:focus { border-color: rgba(240,180,41,0.4); }
+.review-err { color: #e74c3c; font-size: 0.78rem; margin-top: 10px; }
+.review-submit { margin-top: 14px; }
 
 .action-list { display: flex; flex-direction: column; gap: 10px; }
 .btn {

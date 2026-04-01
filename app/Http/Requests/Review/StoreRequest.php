@@ -14,10 +14,9 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'appointment_id' => 'required|exists:appointments,id',
-            'raqi_id' => 'required|exists:raqi_profiles,id',
+            'appointment_id' => 'required|uuid|exists:appointments,id',
             'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'nullable|string',
+            'comment' => 'nullable|string|max:5000',
         ];
     }
 }
