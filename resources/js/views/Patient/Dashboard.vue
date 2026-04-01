@@ -32,7 +32,7 @@
           <div class="action-card-title">Book Appointment</div>
           <div class="action-card-sub">Find and book with an available Raqi</div>
         </router-link>
-        <router-link to="/patient/raqis" class="action-card">
+        <router-link to="/raqis" class="action-card">
           <div class="action-card-icon">👥</div>
           <div class="action-card-title">Browse Raqis</div>
           <div class="action-card-sub">View profiles and availability</div>

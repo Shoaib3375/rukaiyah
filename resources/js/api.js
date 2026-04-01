@@ -84,7 +84,8 @@ export const patientAPI = {
 export const raqiAPI = {
     profile: {
         get: () => api.get('/raqi/profile'),
-        update: (data) => api.put('/raqi/profile', data)
+        update: (data) => api.put('/raqi/profile', data),
+        updatePassword: (data) => api.put('/raqi/profile/password', data),
     },
     availability: {
         list: () => api.get('/raqi/availability'),

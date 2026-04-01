@@ -56,6 +56,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:api', 'role:raqi'])->prefix('raqi')->group(function () {
         Route::get('profile', [RaqiProfileController::class, 'show']);
         Route::put('profile', [RaqiProfileController::class, 'update']);
+        Route::put('profile/password', [RaqiProfileController::class, 'updatePassword']);
     });
 
     // Raqi — operational routes require approval
